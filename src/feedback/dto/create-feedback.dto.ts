@@ -1,1 +1,4 @@
-export class CreateFeedbackDto {}
+export class CreateFeedbackDto {
+  message: string;
+  sender: string;
+}

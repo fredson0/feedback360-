@@ -1,35 +1,46 @@
-import { Injectable } from '@nestjs/common';
-import { CreateFeedbackDto } from './dto/create-feedback.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Feedback } from '@prisma/client';
+import { CreateFeedbackDto } from './dto/create-feedback.dto';
+import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 
 @Injectable()
 export class FeedbackService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // Criar um novo feedback usando o DTO
   async create(createFeedbackDto: CreateFeedbackDto): Promise<Feedback> {
     return this.prisma.feedback.create({
-      data: createFeedbackDto,
+      data: {
+        message: createFeedbackDto.message,
+        sender: createFeedbackDto.sender,
+      },
     });
   }
 
-  // Listar todos os feedbacks
   async findAll(): Promise<Feedback[]> {
     return this.prisma.feedback.findMany();
   }
 
-  // Buscar um feedback pelo ID
-  async findOne(id: string): Promise<Feedback | null> {
-    return this.prisma.feedback.findUnique({
+  async findOne(id: string): Promise<Feedback> {
+    const feedback = await this.prisma.feedback.findUnique({ where: { id } });
+    if (!feedback) throw new NotFoundException(`Feedback com ID ${id} não encontrado`);
+    return feedback;
+  }
+
+  async update(id: string, updateFeedbackDto: UpdateFeedbackDto): Promise<Feedback> {
+    await this.findOne(id);
+    return this.prisma.feedback.update({
       where: { id },
+      data: {
+        message: updateFeedbackDto.message,
+        sender: updateFeedbackDto.sender,
+      },
     });
   }
 
-  // Deletar um feedback pelo ID
-  async remove(id: string): Promise<Feedback> {
-    return this.prisma.feedback.delete({
-      where: { id },
-    });
+  async remove(id: string): Promise<{ message: string }> {
+    await this.findOne(id);
+    await this.prisma.feedback.delete({ where: { id } });
+    return { message: `Feedback com ID ${id} foi deletado com sucesso` };
   }
 }
