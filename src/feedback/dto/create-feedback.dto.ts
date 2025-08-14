@@ -1,4 +1,10 @@
+import {IsNotEmpty,IsOptional} from 'class-validator';
+
 export class CreateFeedbackDto {
-  message: string;
-  sender: string;
+  @IsNotEmpty()
+  message:string;
+
+  @IsOptional()
+  sender?: string;
 }
+

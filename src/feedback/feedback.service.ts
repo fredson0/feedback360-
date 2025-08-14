@@ -12,7 +12,7 @@ export class FeedbackService {
     return this.prisma.feedback.create({
       data: {
         message: createFeedbackDto.message,
-        sender: createFeedbackDto.sender,
+        sender: createFeedbackDto.sender || 'Anônimo',
       },
     });
   }
@@ -33,7 +33,7 @@ export class FeedbackService {
       where: { id },
       data: {
         message: updateFeedbackDto.message,
-        sender: updateFeedbackDto.sender,
+        sender: updateFeedbackDto.sender || 'Anônimo',
       },
     });
   }
