@@ -1,0 +1,48 @@
+a ideia aqui é aprimorar as minhas abilidades enquanto construo um projeto
+
+Plataforma de Feedback 360° – Aplicação Web
+Aplicação full stack para gestão de feedbacks em equipes, com autenticação JWT, controle de acesso por papéis e painéis interativos. Arquitetura modular com NestJS e PostgreSQL, validação com Zod e documentação com Swagger. Frontend em Next.js com TypeScript e TailwindCSS. Deploy com Docker, CI/CD via GitHub Actions e hospedagem em DigitalOcean.
+
+Stack: NestJS · TypeScript · PostgreSQL · Prisma ORM · Next.js · TailwindCSS · Docker · GitHub Actions
+
+
+
+# 🧠 Feedback360
+
+**Feedback360** é uma aplicação web desenvolvida com NestJS, Prisma ORM e PostgreSQL, que permite o registro e gerenciamento de feedbacks anônimos ou identificados entre membros de uma equipe.
+
+---
+
+## 🚀 Tecnologias Utilizadas
+
+- **NestJS**: Framework Node.js baseado em TypeScript para criar aplicações backend modulares e escaláveis.
+- **Prisma ORM**: ORM moderno e intuitivo para banco de dados relacional (PostgreSQL), usado para mapear modelos e acessar dados de forma tipada.
+- **PostgreSQL**: Banco de dados relacional usado para armazenar os feedbacks.
+- **Docker**: Utilizado para isolar o banco de dados PostgreSQL e facilitar o ambiente de desenvolvimento.
+- **TypeScript**: Linguagem principal do projeto.
+
+---
+
+## ⚙️ Funcionalidades do Projeto
+
+- [x] Enviar feedback com mensagem e remetente (nome ou "anônimo")
+- [x] Listar todos os feedbacks registrados
+- [ ] (Em breve) Login e autenticação de usuários
+- [ ] (Em breve) Relatórios e estatísticas de feedbacks por período ou por remetente
+
+---
+
+## 📦 Estrutura do Projeto
+
+```bash
+feedback360/
+├── prisma/                 # Arquivos do Prisma ORM
+│   └── schema.prisma
+├── src/
+│   ├── feedback/           # Módulo responsável por feedbacks
+│   ├── app.module.ts
+│   └── main.ts
+├── docker-compose.yml      # (opcional) configuração do banco
+├── .env                    # Variáveis de ambiente
+├── package.json
+└── README.md
