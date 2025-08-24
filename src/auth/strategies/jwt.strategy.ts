@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor() {
+  constructor(private readonly userService: UserService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -13,13 +14,20 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    // Método que vai receber o payload decodificado do JWT
-    // Aqui você vai implementar!
-    return{
-        id:payload.sub,
-        nome: payload.nome,
-        email: payload.email,
-        role: payload.role
+    const userId = payload.sub;
+    
+    // Buscar usuário no banco para verificar se ainda existe e está ativo
+    const user = await this.userService.findById(userId);
+
+    if (!user || !user.isActive) {
+      throw new UnauthorizedException('Acesso negado');
+    }
+    
+    return {
+      id: user.id,
+      nome: user.nome,
+      email: user.email,
+      role: user.role
     };
   }
 }

@@ -50,6 +50,12 @@ export class UserService {
         });
     }
 
+    async findById(id:string){
+        return this.prisma.user.findUnique({
+            where: { id }
+        });
+    }
+
    async login(loginDto: LoginDto){
       const user = await this.findByEmail(loginDto.email);
 
