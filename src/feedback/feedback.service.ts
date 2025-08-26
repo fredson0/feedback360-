@@ -8,13 +8,14 @@ import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 export class FeedbackService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createFeedbackDto: CreateFeedbackDto): Promise<Feedback> {
+  async create(createFeedbackDto: CreateFeedbackDto, user: any): Promise<Feedback> {
     console.log('📝 Criando feedback:', createFeedbackDto);
     
     const result = await this.prisma.feedback.create({
       data: {
         message: createFeedbackDto.message,
-        sender: createFeedbackDto.sender || 'Anônimo',
+        userId: user.id,
+        sender: user.nome,
       },
     });
     
@@ -32,13 +33,23 @@ export class FeedbackService {
     return feedback;
   }
 
-  async update(id: string, updateFeedbackDto: UpdateFeedbackDto): Promise<Feedback> {
-    await this.findOne(id);
+  async update(id: string, updateFeedbackDto: UpdateFeedbackDto, user: any): Promise<Feedback> {
+    console.log('🔄 Atualizando feedback:', { id, userId: user.id });
+    
+    // Busca o feedback e verifica se existe
+    const feedback = await this.findOne(id);
+    
+    // Verifica se o usuário é o dono do feedback
+    if (feedback.userId !== user.id) {
+      throw new BadRequestException('Você só pode editar seus próprios feedbacks');
+    }
+    
+    // Só permite alterar a mensagem - o sender continua o mesmo
     return this.prisma.feedback.update({
       where: { id },
       data: {
         message: updateFeedbackDto.message,
-        sender: updateFeedbackDto.sender || 'Anônimo',
+        // sender não muda - continua sendo o mesmo usuário
       },
     });
   }
