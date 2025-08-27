@@ -4,6 +4,13 @@ import { Feedback } from '@prisma/client';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 
+interface WhereFilter {
+  sender?: string;
+}
+
+interface OrderByQuery {
+  [key: string]: 'asc' | 'desc';
+}
 @Injectable()
 export class FeedbackService {
   constructor(private readonly prisma: PrismaService) {}
@@ -23,9 +30,34 @@ export class FeedbackService {
     return result;
   }
 
-  async findAll(): Promise<Feedback[]> {
-    return this.prisma.feedback.findMany();
+  async findAll(
+    limit: number,
+    page: number,
+    sender?: string,
+    orderBy?: string,
+    order?: string
+  ): Promise<Feedback[]> {
+
+    const where: WhereFilter = {};
+    if (sender) {
+      where.sender = sender;
+    }
+
+    const orderQuery: OrderByQuery = {};
+    if (orderBy && order && (order === 'asc'|| order === 'desc')) {
+      orderQuery[orderBy] = order;
+    }
+
+    const skip = (page - 1) * limit;
+    const feedback = await this.prisma.feedback.findMany({
+      skip,
+      take: limit,
+      where,
+      orderBy: orderQuery,
+    });
+    return feedback;
   }
+  
 
   async findOne(id: string): Promise<Feedback> {
     const feedback = await this.prisma.feedback.findUnique({ where: { id } });
