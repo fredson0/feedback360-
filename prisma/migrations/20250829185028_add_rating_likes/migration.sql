@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "public"."Feedback" ADD COLUMN     "likes" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "rating" INTEGER NOT NULL DEFAULT 5;

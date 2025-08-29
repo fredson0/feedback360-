@@ -11,6 +11,8 @@ model Feedback {
   id        String   @id @default(uuid())
   message   String
   sender    String
+  rating    Int      @default(5)
+  likes     Int      @default(0)
   createdAt DateTime @default(now())
   userId    String?
   user      User?    @relation(fields: [userId], references: [id])

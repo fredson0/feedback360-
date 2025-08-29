@@ -4,6 +4,8 @@ export class CreateFeedbackDto {
   @IsNotEmpty()
   message:string;
 
+  rating?: number;
+
   
 }
 

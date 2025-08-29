@@ -23,6 +23,7 @@ export class FeedbackService {
         message: createFeedbackDto.message,
         userId: user.id,
         sender: user.nome,
+        rating: createFeedbackDto.rating || 5,
       },
     });
     
@@ -108,6 +109,22 @@ export class FeedbackService {
       throw new NotFoundException(`nenhum feedback foi encontrado para o sender: ${sender}`);
     }
     return feedbacks;
+  }
+
+  async findByRanking(): Promise<any[]>{
+
+    const feedbacks = await this.prisma.feedback.findMany();
+    const calcularScore = (feedback: Feedback) =>{
+      return (feedback.rating * 60) + (feedback.likes * 3);
+    }
+      const feedbacksComScore = feedbacks.map(feedback => {
+        return {
+          ...feedback,
+          score: calcularScore(feedback)
+        };
+      });
+      const feedbacksOrdenados = feedbacksComScore.sort((a,b) => b.score - a.score);
+      return feedbacksOrdenados;
   }
 
 }

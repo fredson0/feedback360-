@@ -37,6 +37,11 @@ export class FeedbackController {
     return this.feedbackService.findBySender(senderId);
   }
 
+  @Get('ranking')
+  getRanking(){
+    return this.feedbackService.findByRanking();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.feedbackService.findOne(id);
@@ -51,7 +56,5 @@ export class FeedbackController {
   remove(@Param('id') id: string) {
     return this.feedbackService.remove(id);
   }
-    
-  
 
 }
