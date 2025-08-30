@@ -189,7 +189,23 @@ export class FeedbackService {
   }
 
 
-  async searchFeedbacks(searchTerm: string)
+  async searchFeedbacks(searchTerm: string): Promise<any[]> {
+    const feedbacks = await this.prisma.feedback.findMany();
+
+    const resultados = feedbacks.filter(feedback => {
+      return feedback.message.toLowerCase().includes(searchTerm.toLowerCase())
+    });
+
+    const comRelevancia = resultados.map(feedback => {
+      const occurrences = (feedback.message.match(new RegExp(searchTerm, 'gi')) || []).length;
+      return {
+        ...feedback,
+        relevancia: occurrences
+      };
+    });
+
+    return comRelevancia.sort((a, b) => b.relevancia - a.relevancia);
+  }
 
 }
 
