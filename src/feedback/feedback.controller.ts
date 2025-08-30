@@ -42,6 +42,12 @@ export class FeedbackController {
     return this.feedbackService.findByRanking();
   }
 
+  // 👍 ENDPOINT PARA CURTIR FEEDBACK
+  @Post(':id/like')
+  async likeFeedback(@Param('id') feedbackId: string, @Request() req) {
+    return this.feedbackService.likeFeedback(feedbackId, req.user.id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.feedbackService.findOne(id);

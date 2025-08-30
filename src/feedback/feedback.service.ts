@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException,BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException,BadRequestException, ConflictException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Feedback } from '@prisma/client';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
+import { LikeResponseDto } from './dto/like-feedback.dto';
 
 interface WhereFilter {
   sender?: string;
@@ -126,6 +127,69 @@ export class FeedbackService {
       const feedbacksOrdenados = feedbacksComScore.sort((a,b) => b.score - a.score);
       return feedbacksOrdenados;
   }
+
+  // 👍 ALGORITMO DE LIKE - Hash Table + Counter
+  /**
+   * Este algoritmo usa duas estruturas de dados fundamentais:
+   * 1. Hash Table única - para evitar likes duplicados em O(1)
+   * 2. Counter Algorithm - para incrementar likes atomicamente
+   * 
+   * Complexidade: O(1) para verificação + O(1) para inserção
+   */
+  async likeFeedback(feedbackId: string, userId: string): Promise<LikeResponseDto> {
+    console.log('👍 Executando algoritmo de like:', { feedbackId, userId });
+    
+    // Verificar se feedback existe
+    const feedback = await this.findOne(feedbackId);
+    
+    // HASH TABLE LOOKUP - O(1) - Verificar se já curtiu
+    const existingLike = await this.prisma.feedbackLike.findUnique({
+      where: {
+        unique_user_feedback_like: {
+          userId,
+          feedbackId
+        }
+      }
+    });
+    
+    if (existingLike) {
+      throw new ConflictException('Você já curtiu este feedback');
+    }
+    
+    // TRANSAÇÃO ATÔMICA - Para garantir consistência dos dados
+    const result = await this.prisma.$transaction(async (tx) => {
+      // 1. Inserir na Hash Table de likes (chave única)
+      await tx.feedbackLike.create({
+        data: {
+          userId,
+          feedbackId
+        }
+      });
+      
+      // 2. COUNTER ALGORITHM - Incrementar likes atomicamente
+      const updatedFeedback = await tx.feedback.update({
+        where: { id: feedbackId },
+        data: {
+          likes: {
+            increment: 1  // Operação atômica de incremento
+          }
+        }
+      });
+      
+      return updatedFeedback;
+    });
+    
+    console.log('✅ Like adicionado! Novo total:', result.likes);
+    
+    return {
+      liked: true,
+      likesCount: result.likes,
+      message: 'Feedback curtido com sucesso!'
+    };
+  }
+
+
+  async searchFeedbacks(searchTerm: string)
 
 }
 

@@ -8,24 +8,43 @@ datasource db {
 }
 
 model Feedback {
-  id        String   @id @default(uuid())
+  id        String         @id @default(uuid())
   message   String
   sender    String
-  rating    Int      @default(5)
-  likes     Int      @default(0)
-  createdAt DateTime @default(now())
+  rating    Int            @default(5)
+  likes     Int            @default(0)
+  createdAt DateTime       @default(now())
   userId    String?
-  user      User?    @relation(fields: [userId], references: [id])
+  user      User?          @relation(fields: [userId], references: [id])
+  
+  // Relacionamento com likes recebidos pelo feedback
+  feedbackLikes FeedbackLike[]
 }
 
 model User {
-  id        String     @id @default(uuid())
+  id        String         @id @default(uuid())
   nome      String
-  email     String     @unique
+  email     String         @unique
   password  String
-  role      String     @default("USER")
-  isActive  Boolean    @default(true)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  role      String         @default("USER")
+  isActive  Boolean        @default(true)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
   feedbacks Feedback[]
+  likes     FeedbackLike[] // Relacionamento com likes dados pelo usuário
+}
+
+model FeedbackLike {
+  id         String   @id @default(uuid())
+  userId     String
+  feedbackId String
+  createdAt  DateTime @default(now())
+  
+  // Relacionamentos
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  feedback Feedback @relation(fields: [feedbackId], references: [id], onDelete: Cascade)
+  
+  // Hash Table única - um usuário só pode curtir um feedback uma vez
+  @@unique([userId, feedbackId], name: "unique_user_feedback_like")
+  @@map("feedback_likes")
 }
