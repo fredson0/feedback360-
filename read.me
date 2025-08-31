@@ -78,3 +78,44 @@ cd feedback360-
 npm install        # Instalar dependências
 docker-compose up  # Subir banco PostgreSQL
 npm run start:dev  # Rodar projeto
+
+
+
+
+plano para a semana 1 de setembro a 5 de setembro
+
+Plano de Desenvolvimento para a Semana
+Dia 1: Busca Avançada
+Implementar endpoint de autocomplete (/feedback/autocomplete?q=termo)
+Permitir busca por múltiplos campos (mensagem, sender)
+Testar e documentar exemplos de uso
+
+Dia 2: Filtros Combinados
+Adicionar filtros por rating, likes, data, sender no endpoint de busca
+Permitir ordenação customizada (mais relevantes, mais curtidos, mais recentes)
+Testar com diferentes combinações de filtros
+
+Dia 3: Sistema de Likes e Recomendações
+Criar endpoints para curtir/descurtir feedbacks
+Implementar recomendação simples (feedbacks mais curtidos ou mais relevantes)
+Exibir sugestões personalizadas para o usuário
+
+Dia 4: Cache para Performance
+Implementar cache em memória (LRU) para buscas populares
+Medir e comparar performance com e sem cache
+Documentar resultados e ganhos
+
+Dia 5: Testes Automatizados
+Adicionar testes unitários e de integração (Jest)
+Testar endpoints, regras de negócio e algoritmos
+Garantir cobertura mínima de testes
+
+Dia 6: Documentação e Apresentação
+Melhorar README com exemplos, prints e explicação dos algoritmos
+Documentar decisões técnicas e aprendizados
+Preparar apresentação do projeto para portfólio/entrevista
+
+Dia 7: Deploy e Portfólio
+Subir o projeto em plataforma gratuita (Heroku, Vercel, Railway)
+Adicionar ao seu portfólio e LinkedIn
+Compartilhar aprendizados em artigo ou post

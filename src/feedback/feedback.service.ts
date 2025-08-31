@@ -207,5 +207,30 @@ export class FeedbackService {
     return comRelevancia.sort((a, b) => b.relevancia - a.relevancia);
   }
 
+
+  async binarySearchByRating(targetRating: number): Promise<Feedback[]> {
+
+  const feedbacks = await this.prisma.feedback.findMany({
+    orderBy: { rating: 'asc' }
+  })
+  
+  let left = 0;
+  let right = feedbacks.length - 1;
+
+  while ( left <= right) {
+    const middle = Math.floor((left + right) / 2);
+    if (feedbacks[middle].rating === targetRating) {
+      return feedbacks.filter(feedback => feedback.rating === targetRating);
+    }
+    else if (feedbacks[middle].rating < targetRating){
+      left = middle + 1;
+    }
+    else {
+      right = middle - 1;
+    }
+    
+  }
+  return [];
+}
 }
 

@@ -47,6 +47,12 @@ export class FeedbackController {
     return this.feedbackService.searchFeedbacks(searchTerm);
   }
 
+  @Get('binary-search')
+  async binarySearch(@Query('rating')rating: string){
+    const targetRating = Number(rating);
+    return this.feedbackService.binarySearchByRating(targetRating);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.feedbackService.findOne(id);
