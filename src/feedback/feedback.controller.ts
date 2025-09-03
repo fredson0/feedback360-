@@ -47,6 +47,11 @@ export class FeedbackController {
     return this.feedbackService.searchFeedbacks(searchTerm);
   }
 
+  @Get('autocomplete')
+  async autocomplete(@Query('q') query: string){
+    return this.feedbackService.autocomplete(query);
+  }
+
   @Get('binary-search')
   async binarySearch(@Query('rating')rating: string){
     const targetRating = Number(rating);

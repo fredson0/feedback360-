@@ -4,6 +4,7 @@ import { Feedback } from '@prisma/client';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 import { LikeResponseDto } from './dto/like-feedback.dto';
+import { Trie } from 'src/common/utils/trie';
 
 interface WhereFilter {
   sender?: string;
@@ -14,7 +15,11 @@ interface OrderByQuery {
 }
 @Injectable()
 export class FeedbackService {
-  constructor(private readonly prisma: PrismaService) {}
+  private trie = new Trie(); // 🌳 Nossa árvore de busca!
+
+  constructor(private readonly prisma: PrismaService) {
+    this.initializeTrie(); // Carregar dados existentes
+  }
 
   async create(createFeedbackDto: CreateFeedbackDto, user: any): Promise<Feedback> {
     console.log('📝 Criando feedback:', createFeedbackDto);
@@ -27,6 +32,17 @@ export class FeedbackService {
         rating: createFeedbackDto.rating || 5,
       },
     });
+    
+    // 🌳 Adicionar ao Trie para autocomplete
+    this.trie.insert(result.sender, `${result.sender} - "${result.message}"`);
+    
+    // Indexar palavras da mensagem
+    const words = result.message.toLowerCase().split(' ');
+    for (const word of words) {
+      if (word.length > 2) {
+        this.trie.insert(word, `${result.sender} - "${result.message}"`);
+      }
+    }
     
     console.log('✅ Feedback criado com ID:', result.id);
     return result;
@@ -232,5 +248,46 @@ export class FeedbackService {
   }
   return [];
 }
+
+  // 🌳 TRIE - Métodos para autocomplete
+  private async initializeTrie(): Promise<void> {
+    console.log('🚀 Inicializando Trie com dados existentes...');
+    
+    try {
+      const feedbacks = await this.prisma.feedback.findMany();
+      
+      for (const feedback of feedbacks) {
+        // Indexar por sender
+        this.trie.insert(feedback.sender, `${feedback.sender} - "${feedback.message}"`);
+        
+        // Indexar por palavras da mensagem
+        const words = feedback.message.toLowerCase().split(' ');
+        for (const word of words) {
+          if (word.length > 2) { // Só palavras com 3+ caracteres
+            this.trie.insert(word, `${feedback.sender} - "${feedback.message}"`);
+          }
+        }
+      }
+      
+      console.log(`✅ Trie inicializado com ${feedbacks.length} feedbacks!`);
+    } catch (error) {
+      console.log('⚠️ Erro ao inicializar Trie (banco pode estar vazio):', error.message);
+    }
+  }
+
+  // 🔍 Autocomplete endpoint
+  async autocomplete(query: string): Promise<string[]> {
+    console.log(`🔍 Buscando autocomplete para: "${query}"`);
+    
+    if (!query || query.length < 2) {
+      return []; // Muito curto para buscar
+    }
+    
+    const results = this.trie.search(query.toLowerCase());
+    console.log(`📊 Encontrados ${results.length} resultados para "${query}"`);
+    
+    // Limitar a 10 resultados e remover duplicatas
+    return [...new Set(results)].slice(0, 10);
+  }
 }
 
