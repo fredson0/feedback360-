@@ -5,6 +5,7 @@ import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 import { LikeResponseDto } from './dto/like-feedback.dto';
 import { Trie } from 'src/common/utils/trie';
+import { CacheService } from 'src/common/cache/cache.service';
 
 interface WhereFilter {
   sender?: string;
@@ -17,7 +18,10 @@ interface OrderByQuery {
 export class FeedbackService {
   private trie = new Trie(); // 🌳 Nossa árvore de busca!
 
-  constructor(private readonly prisma: PrismaService) {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cacheService: CacheService, // 💾 Nosso cache LRU!
+  ) {
     this.initializeTrie(); // Carregar dados existentes
   }
 
@@ -130,18 +134,27 @@ export class FeedbackService {
 
   async findByRanking(): Promise<any[]>{
 
+    const cached = this.cacheService.getRanking('rankings');
+    if (cached){
+      console.log('💨 Cache HIT para rankings');
+      return cached;
+    }
+    console.log('🔍 Cache MISS - calculando rankings...');
+    
     const feedbacks = await this.prisma.feedback.findMany();
     const calcularScore = (feedback: Feedback) =>{
       return (feedback.rating * 60) + (feedback.likes * 3);
     }
-      const feedbacksComScore = feedbacks.map(feedback => {
-        return {
-          ...feedback,
-          score: calcularScore(feedback)
-        };
-      });
-      const feedbacksOrdenados = feedbacksComScore.sort((a,b) => b.score - a.score);
-      return feedbacksOrdenados;
+    const feedbacksComScore = feedbacks.map(feedback => {
+      return {
+        ...feedback,
+        score: calcularScore(feedback)
+      };
+    });
+    const feedbacksOrdenados = feedbacksComScore.sort((a,b) => b.score - a.score);
+    
+    this.cacheService.setRanking('rankings', feedbacksOrdenados);
+    return feedbacksOrdenados;
   }
 
   // 👍 ALGORITMO DE LIKE - Hash Table + Counter
@@ -276,18 +289,24 @@ export class FeedbackService {
   }
 
   // 🔍 Autocomplete endpoint
-  async autocomplete(query: string): Promise<string[]> {
-    console.log(`🔍 Buscando autocomplete para: "${query}"`);
-    
-    if (!query || query.length < 2) {
-      return []; // Muito curto para buscar
+async autocomplete(query: string): Promise<string[]> {
+    const cached = this.cacheService.getAutocomplete(query.toLowerCase());
+    if (cached) {
+        console.log('🔍 Resultado de autocomplete do cache para:', query);
+        return cached;
     }
-    
-    const results = this.trie.search(query.toLowerCase());
-    console.log(`📊 Encontrados ${results.length} resultados para "${query}"`);
-    
-    // Limitar a 10 resultados e remover duplicatas
-    return [...new Set(results)].slice(0, 10);
-  }
+   if (!query || query.length < 2) {
+       return []; 
+   }
+   console.log('cache miss - buscando na Trie para:', query);
+   const result = this.trie.search(query.toLowerCase());
+
+   const finalresult = [...new Set(result)].slice(0, 10);
+
+   this.cacheService.setAutocomplete(query.toLowerCase(), finalresult);
+   return finalresult;
+
 }
+}
+
 

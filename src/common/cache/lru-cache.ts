@@ -14,7 +14,8 @@ class LruNode<T> {
     }
 
 }
-class LRUCache<T>{
+
+export class LRUCache<T>{
     private capacity: number;
     private cache: Map<string, LruNode<T>>;
     private head: LruNode<T>;
@@ -32,7 +33,7 @@ class LRUCache<T>{
     private addToFront(node: LruNode<T>): void {
         node.next = this.head.next;
         node.prev = this.head;
-        this.head.next.prev = node;
+        this.head.next!.prev = node;
         this.head.next = node;
     }
 
