@@ -79,12 +79,27 @@ export class MaxHeap<T> {
     }
 
     extractMax(): T | null {
-        // TODO: 1. Salvar o máximo (primeiro elemento)
-        // TODO: 2. Mover último para primeira posição
-        // TODO: 3. Remover último
-        // TODO: 4. Fazer heapifyDown
+         if (this.isEmpty()) {
         return null;
     }
+    
+    // 2️⃣ Se só tem 1 elemento, remover e retornar
+    if (this.size() === 1) {
+        return this.heap.pop()!;
+    }
+    
+    // 3️ Salvar o máximo (raiz)
+    const max = this.heap[0];
+    
+    // 4️ Mover último elemento para raiz
+    this.heap[0] = this.heap.pop()!;
+    
+    // 5️ Fazer heapifyDown para reorganizar
+    this.heapifyDown();
+    
+    // 6️ Retornar o máximo salvo
+    return max;
+}
 
     peek(): T | null {
         return this.heap.length === 0 ? null : this.heap[0];
