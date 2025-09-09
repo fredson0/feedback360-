@@ -58,10 +58,17 @@ export class FeedbackController {
     return this.feedbackService.binarySearchByRating(targetRating);
   }
 
+  @Get('top/:k')
+  async getTopK(@Param('k')k: string): Promise<any[]>{
+    const topK = parseInt(k);
+    return this.feedbackService.getTopKFeedbacks(topK);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.feedbackService.findOne(id);
   }
+
 
   // 👍 ENDPOINT PARA CURTIR FEEDBACK
   @Post(':id/like')

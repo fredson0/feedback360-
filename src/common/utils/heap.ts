@@ -131,8 +131,22 @@ export class MaxHeap<T> {
     }
 
     private heapifyDown(): void {
-        // TODO: Mover elemento para baixo até posição correta  
-        // Usar while loop comparando com filhos
+        let index = 0
+
+        while (this.hasLeftChild(index)){
+            let largerChildIndex = this.getLeftChildIndex(index);
+
+            if (this.hasRightChild(index) &&
+                this.compare(this.rightChild(index), this.leftChild(index)) > 0) {
+                    largerChildIndex = this.getRightChildIndex(index);
+                }
+
+                if (this.compare(this.heap[index], this.heap[largerChildIndex]) > 0){
+                    break;
+                }
+                this.swap(index, largerChildIndex);
+                index = largerChildIndex;
+        }
     }
 
     // 🎯 MÉTODO ESPECIAL PARA NOSSO PROJETO
@@ -140,6 +154,22 @@ export class MaxHeap<T> {
     getTopK(k: number): T[] {
         // TODO: Retornar os K maiores elementos
         // Usar extractMax() K vezes
+
+         if (k <= 0 || this.isEmpty()) {
         return [];
+    }
+        const originalHeap = [...this.heap];
+        const result: T[] = [];
+
+        for(let i = 0; i< k && !this.isEmpty(); i++) {
+            const max = this.extractMax();
+            if (max !== null) {
+                result.push(max);
+            }
+        }
+        this.heap = originalHeap;
+
+        return result;
+
     }
 }

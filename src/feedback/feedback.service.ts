@@ -6,6 +6,7 @@ import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 import { LikeResponseDto } from './dto/like-feedback.dto';
 import { Trie } from 'src/common/utils/trie';
 import { CacheService } from 'src/common/cache/cache.service';
+import { MaxHeap } from 'src/common/utils/heap';
 
 interface WhereFilter {
   sender?: string;
@@ -155,6 +156,18 @@ export class FeedbackService {
     
     this.cacheService.setRanking('rankings', feedbacksOrdenados);
     return feedbacksOrdenados;
+  }
+
+  async getTopKFeedbacks(k: number): Promise<any[]>{
+      const feedbacks = await this.prisma.feedback.findMany();
+      const calcularScore = (feedback: Feedback) => {
+        return (feedback.rating * 60) + (feedback.likes * 3);
+      }
+      const heap = new MaxHeap<{ feedback: Feedback, score: number }>((a, b) => a.score - b.score);
+      feedbacks.forEach(feedback => {
+        heap.insert({ feedback, score: calcularScore(feedback) });
+      });
+      return heap.getTopK(k);
   }
 
   // 👍 ALGORITMO DE LIKE - Hash Table + Counter
