@@ -111,7 +111,41 @@ export class Graph<T> {
     findShortestPath(from: T, to: T): T[] {
         // TODO: Encontrar caminho mais curto entre dois usuários
         // Útil para "grau de separação" entre usuários
-        return [];
+        if (!this.hasVertex(from) || !this.hasVertex(to)){
+            return [];
+        }
+        if (from === to){
+            return [from];
+        }
+        const queue: T[] = [from];
+        const visited = new Set<T>([from]);
+        const parent = new Map<T, T> ();
+
+        while (queue.length > 0){
+            const current = queue.shift()!;
+
+            if (current === to){
+                break;
+            }
+
+            for (const neighbor of this.getNeighbors(current)){
+                if (!visited.has(neighbor)){
+                    visited.add(neighbor);
+                    queue.push(neighbor);
+                    parent.set(neighbor, current);
+                }
+            }
+        }
+        if (!parent.has(to) && from !== to){
+            return [];
+        }
+        const path: T[] = [];
+        let current: T | undefined = to;
+        while (current) {
+            path.unshift(current);
+            current = parent.get(current);
+        }
+        return path;
     }
 
     findConnectedComponents(): T[][] {
