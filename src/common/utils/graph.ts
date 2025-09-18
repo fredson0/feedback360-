@@ -151,8 +151,33 @@ export class Graph<T> {
     findConnectedComponents(): T[][] {
         // TODO: Encontrar grupos de usuários conectados
         // Útil para identificar "comunidades" na plataforma
-        return [];
+        const visited = new Set<T>();
+        const components: T[][] = [];
+
+        for (const vertex of this.getVertices()){
+            if (!visited.has(vertex)) {
+                const stack: T[] = [vertex];
+                const currentComponent: T[] = [];
+                
+                while (stack.length > 0) {
+                    const current = stack.pop()!;
+                    currentComponent.push(current);
+                    visited.add(current);
+
+                    for (const neighbor of this.getNeighbors(current)) {
+                        if (!visited.has(neighbor)) {
+                            visited.add(neighbor);
+                            stack.push(neighbor);
+                        }
+                    }
+                }
+                components.push(currentComponent);
+            }
+        }
+        return components;
     }
+       
+    
 
     getMostConnectedVertices(limit: number = 5): T[] {
         // TODO: Encontrar usuários mais conectados (influenciadores)
