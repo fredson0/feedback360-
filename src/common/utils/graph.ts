@@ -182,7 +182,19 @@ export class Graph<T> {
     getMostConnectedVertices(limit: number = 5): T[] {
         // TODO: Encontrar usuários mais conectados (influenciadores)
         // Ordenar por número de conexões
-        return [];
+        if( this.isEmpty()){
+            return [];
+        }
+        const vertexDegrees: Array<{vertex: T, degree: number}> = [];
+
+        for (const vertex of this.getVertices()){
+            const degree = this.getNeighbors(vertex).length;
+            vertexDegrees.push({vertex, degree});
+        }
+
+        vertexDegrees.sort((a, b) => b.degree - a.degree);
+
+        return vertexDegrees.slice(0, limit).map(item => item.vertex);
     }
 
     // 🎯 MÉTODOS UTILITÁRIOS
@@ -198,7 +210,21 @@ export class Graph<T> {
     }
 
     print(): void {
-        // TODO: Imprimir representação do grafo (debug)
-        console.log('Grafo vazio');
+        //  Imprimir representação do grafo (debug)
+        if (this.isEmpty()){
+            console.log('Grafo vazio - nenhum vértice encontrado');
+            return;
+        }
+        
+        //  Cabeçalho informativo
+        console.log('=== ESTRUTURA DO GRAFO ===');
+        console.log(`Total de vértices: ${this.size()}`);
+
+        //  Loop pelos vértices
+        console.log('\nConexões:');
+        for (const vertex of this.getVertices()) {
+            const neighbors = this.getNeighbors(vertex);
+            console.log(`- ${vertex} (${neighbors.length} conexões): ${neighbors.join(', ')}`);
+        }
     }
 }
