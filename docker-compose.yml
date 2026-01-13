@@ -1,18 +1,22 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:15
-    container_name: nest_postgres
+    container_name: feedback360_postgres_new
     restart: always
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: secret123
-      POSTGRES_DB: feedback360
+      POSTGRES_USER: feedback_user
+      POSTGRES_PASSWORD: feedback123456
+      POSTGRES_DB: feedback360_db
     ports:
-      - '5432:5432'
+      - '5433:5432'
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - feedback360_new_data:/var/lib/postgresql/data
+    networks:
+      - feedback360_network
+
+networks:
+  feedback360_network:
+    driver: bridge
 
 volumes:
-  pgdata:
+  feedback360_new_data:
