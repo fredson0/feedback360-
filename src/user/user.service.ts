@@ -38,9 +38,21 @@ export class UserService {
 
         console.log('usuario criado com ID', user.id);
 
+        // Gera o token JWT para o usuário recém-criado
+        const payLoad = {
+            sub: user.id,
+            nome: user.nome,
+            email: user.email,
+        }
+        const accessToken = await this.jwtService.signAsync(payLoad);
+
         // remove a senha da resposta
         const { password, ...userWithoutPassword } = user;
-        return userWithoutPassword;
+        return {
+            message: 'Usuário criado com sucesso',
+            access_token: accessToken,
+            user: userWithoutPassword
+        };
     }
 
      
@@ -81,7 +93,7 @@ export class UserService {
        const { password, ...userWthoutPassword} = user;
          return {
             message: 'Login realizado com sucesso',
-            accessToken: accessToken,
+            access_token: accessToken,
             user: userWthoutPassword
           }
 
