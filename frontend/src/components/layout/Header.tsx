@@ -14,6 +14,7 @@ export function Header() {
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Feedbacks', href: '/feedbacks', icon: MessageSquare },
     { name: 'Ranking', href: '/ranking', icon: Trophy },
+    { name: 'Perfil', href: '/profile', icon: User },
   ]
 
   const isActive = (path: string) => pathname === path
@@ -54,7 +55,7 @@ export function Header() {
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2 text-sm text-gray-700">
               <User className="w-5 h-5" />
-              <span className="hidden sm:block">{user?.name}</span>
+              <span className="hidden sm:block">{user?.nome}</span>
             </div>
             <Button
               variant="outline"

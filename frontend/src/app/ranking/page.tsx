@@ -86,11 +86,11 @@ export default function RankingPage() {
                     <div className="flex-1">
                       <div className="flex items-center space-x-3 mb-2">
                         <span className="text-sm font-semibold text-gray-900">
-                          {item.author.name}
+                          {item.author.nome}
                         </span>
                         <span className="text-sm text-gray-500">→</span>
                         <span className="text-sm font-semibold text-gray-900">
-                          {item.recipient.name}
+                          {item.recipient.nome}
                         </span>
                       </div>
 

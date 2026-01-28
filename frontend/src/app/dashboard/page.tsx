@@ -4,13 +4,14 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { MessageSquare, Clock, CheckCircle, Star } from 'lucide-react'
 import { StatsCard } from './components/StatsCard'
+import { DashboardLayout, Container } from '@/components/layout'
 
 export default function DashboardPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token')
+    const token = localStorage.getItem('token')
     if (!token) {
       router.push('/login')
     } else {
@@ -23,8 +24,8 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 p-8">
-      <div className="max-w-7xl mx-auto">
+    <DashboardLayout>
+      <Container>
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Dashboard</h1>
           <p className="text-gray-600">Bem-vindo ao seu painel de feedbacks</p>
@@ -67,7 +68,7 @@ export default function DashboardPage() {
         <div className="text-gray-500 text-center py-12">
           ActivityChart, RecentFeedbackList e QuickActions virão aqui
         </div>
-      </div>
-    </div>
+      </Container>
+    </DashboardLayout>
   )
 }

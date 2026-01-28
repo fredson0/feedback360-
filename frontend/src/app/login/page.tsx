@@ -25,8 +25,8 @@ export default function LoginPage() {
       } else {
         await register({ email, password, nome: name })
       }
-      // Redirect será feito pelo page.tsx quando user for atualizado
-      router.push('/dashboard')
+      // Redireciona após sucesso
+      window.location.href = '/dashboard'
     } catch (error) {
       console.error(error)
       setLoading(false)

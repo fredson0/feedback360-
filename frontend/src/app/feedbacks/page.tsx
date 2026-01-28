@@ -74,11 +74,11 @@ export default function FeedbacksPage() {
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-2">
                           <span className="text-sm font-semibold text-gray-900">
-                            {feedback.author.name}
+                            {feedback.author.nome}
                           </span>
                           <span className="text-sm text-gray-500">→</span>
                           <span className="text-sm font-semibold text-gray-900">
-                            {feedback.recipient.name}
+                            {feedback.recipient.nome}
                           </span>
                           <Badge variant="info">
                             <Star className="w-3 h-3 mr-1 inline" />
