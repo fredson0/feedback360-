@@ -25,7 +25,7 @@ export default function DashboardPage() {
     try {
       const token = localStorage.getItem('token')
       
-      const response = await fetch('http://localhost:3000/feedback', {
+      const response = await fetch('http://localhost:3005/feedback', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
