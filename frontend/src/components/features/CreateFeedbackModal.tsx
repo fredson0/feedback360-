@@ -16,10 +16,13 @@ export default function CreateFeedbackModal({ isOpen, onClose }: CreateFeedbackM
   const { createFeedback } = useFeedbacks()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState<CreateFeedbackDto>({
-    content: '',
+    message: '',
     rating: 5,
-    recipientId: 0,
+    recipientId: '',
   })
+
+  console.log('👥 Usuários carregados:', users)
+  console.log('📝 FormData atual:', formData)
 
   if (!isOpen) return null
 
@@ -29,7 +32,7 @@ export default function CreateFeedbackModal({ isOpen, onClose }: CreateFeedbackM
 
     try {
       await createFeedback(formData)
-      setFormData({ content: '', rating: 5, recipientId: 0 })
+      setFormData({ message: '', rating: 5, recipientId: '' })
       onClose()
     } catch (error) {
       console.error(error)
@@ -65,10 +68,10 @@ export default function CreateFeedbackModal({ isOpen, onClose }: CreateFeedbackM
                 <select
                   required
                   value={formData.recipientId}
-                  onChange={(e) => setFormData({ ...formData, recipientId: Number(e.target.value) })}
+                  onChange={(e) => setFormData({ ...formData, recipientId: e.target.value })}
                   className="appearance-none rounded-lg block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                 >
-                  <option value={0}>Selecione um usuário</option>
+                  <option value="">Selecione um usuário</option>
                   {users.map(user => (
                     <option key={user.id} value={user.id}>
                       {user.nome} ({user.email})
@@ -102,8 +105,8 @@ export default function CreateFeedbackModal({ isOpen, onClose }: CreateFeedbackM
                 label="Mensagem"
                 required
                 rows={4}
-                value={formData.content}
-                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                value={formData.message}
+                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 placeholder="Escreva seu feedback aqui..."
               />
 

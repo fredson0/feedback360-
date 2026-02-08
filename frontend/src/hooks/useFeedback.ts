@@ -40,7 +40,7 @@ export function useFeedbacks() {
     }
   }
 
-  async function updateFeedback(id: number, data: UpdateFeedbackDto) {
+  async function updateFeedback(id: string, data: UpdateFeedbackDto) {
     try {
       const updated = await feedbackService.update(id, data)
       setFeedbacks(feedbacks.map(f => f.id === id ? updated : f))
@@ -52,7 +52,7 @@ export function useFeedbacks() {
     }
   }
 
-  async function deleteFeedback(id: number) {
+  async function deleteFeedback(id: string) {
     try {
       await feedbackService.delete(id)
       setFeedbacks(feedbacks.filter(f => f.id !== id))
@@ -63,7 +63,7 @@ export function useFeedbacks() {
     }
   }
 
-  async function toggleLike(id: number, isLiked: boolean) {
+  async function toggleLike(id: string, isLiked: boolean) {
     try {
       const updated = isLiked 
         ? await feedbackService.unlike(id)

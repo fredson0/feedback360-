@@ -12,7 +12,7 @@ export const feedbackService = {
     return response.data
   },
 
-  async getById(id: number): Promise<Feedback> {
+  async getById(id: string): Promise<Feedback> {
     const response = await api.get<Feedback>(`/feedback/${id}`)
     return response.data
   },
@@ -22,21 +22,21 @@ export const feedbackService = {
     return response.data
   },
 
-  async update(id: number, data: UpdateFeedbackDto): Promise<Feedback> {
+  async update(id: string, data: UpdateFeedbackDto): Promise<Feedback> {
     const response = await api.patch<Feedback>(`/feedback/${id}`, data)
     return response.data
   },
 
-  async delete(id: number): Promise<void> {
+  async delete(id: string): Promise<void> {
     await api.delete(`/feedback/${id}`)
   },
 
-  async like(id: number): Promise<Feedback> {
+  async like(id: string): Promise<Feedback> {
     const response = await api.post<Feedback>(`/feedback/${id}/like`)
     return response.data
   },
 
-  async unlike(id: number): Promise<Feedback> {
+  async unlike(id: string): Promise<Feedback> {
     const response = await api.delete<Feedback>(`/feedback/${id}/like`)
     return response.data
   },
