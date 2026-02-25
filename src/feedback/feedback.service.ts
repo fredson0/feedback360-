@@ -59,7 +59,8 @@ export class FeedbackService {
     page: number,
     sender?: string,
     orderBy?: string,
-    order?: string
+    order?: string,
+    userId?: string,
   ): Promise<Feedback[]> {
 
     const where: WhereFilter = {};
@@ -73,6 +74,7 @@ export class FeedbackService {
     }
 
     const skip = (page - 1) * limit;
+    
     const feedbacks = await this.prisma.feedback.findMany({
       skip,
       take: limit,
@@ -92,16 +94,61 @@ export class FeedbackService {
             nome: true,
             email: true,
           }
-        }
+        },
+        feedbackLikes: userId ? {
+          where: {
+            userId: userId
+          },
+          select: {
+            id: true
+          }
+        } : false
       }
     });
     
     // Mapear para o formato esperado pelo frontend
-    return feedbacks.map(feedback => ({
+    const mapped = feedbacks.map(feedback => ({
       ...feedback,
-      author: feedback.user,
+      content: feedback.message,
+      author: feedback.user || { id: '', nome: feedback.sender, email: '' },
       authorId: feedback.userId,
-    })) as any;
+      recipientId: feedback.recipientId,
+      isLikedByCurrentUser: userId ? (feedback.feedbackLikes?.length || 0) > 0 : false,
+    }));
+    
+    return mapped as any;
+  }
+
+  // 🧪 MÉTODO DE DEBUG - RETORNA TODOS OS FEEDBACKS SEM FILTRO
+  async debugGetAllFeedbacks(): Promise<any> {
+    const allFeedbacks = await this.prisma.feedback.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            nome: true,
+            email: true,
+          }
+        },
+        recipient: {
+          select: {
+            id: true,
+            nome: true,
+            email: true,
+          }
+        }
+      }
+    });
+    
+    const mapped = allFeedbacks.map(feedback => ({
+      ...feedback,
+      content: feedback.message,
+      author: feedback.user || { id: '', nome: feedback.sender, email: '' },
+      authorId: feedback.userId,
+      recipientId: feedback.recipientId,
+    }));
+    
+    return mapped;
   }
   
 
@@ -238,6 +285,22 @@ export class FeedbackService {
           likes: {
             increment: 1  // Operação atômica de incremento
           }
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              nome: true,
+              email: true,
+            }
+          },
+          recipient: {
+            select: {
+              id: true,
+              nome: true,
+              email: true,
+            }
+          }
         }
       });
       
@@ -246,11 +309,93 @@ export class FeedbackService {
     
     console.log('✅ Like adicionado! Novo total:', result.likes);
     
+    // 🔥 Retornar feedback completo no formato esperado pelo frontend
     return {
-      liked: true,
-      likesCount: result.likes,
-      message: 'Feedback curtido com sucesso!'
-    };
+      ...result,
+      content: result.message,
+      author: result.user || { id: '', nome: result.sender, email: '' },
+      authorId: result.userId,
+      recipientId: result.recipientId,
+      isLikedByCurrentUser: true,
+    } as any;
+  }
+
+  /**
+   * 👎 UNLIKE ALGORITHM
+   * Remove like de um feedback e decrementa o contador
+   */
+  async unlikeFeedback(feedbackId: string, userId: string): Promise<any> {
+    console.log('👎 Executando algoritmo de unlike:', { feedbackId, userId });
+    
+    // Verificar se feedback existe
+    const feedback = await this.findOne(feedbackId);
+    
+    // HASH TABLE LOOKUP - Verificar se realmente curtiu
+    const existingLike = await this.prisma.feedbackLike.findUnique({
+      where: {
+        unique_user_feedback_like: {
+          userId,
+          feedbackId
+        }
+      }
+    });
+    
+    if (!existingLike) {
+      throw new NotFoundException('Você não curtiu este feedback');
+    }
+    
+    // TRANSAÇÃO ATÔMICA
+    const result = await this.prisma.$transaction(async (tx) => {
+      // 1. Remover da Hash Table de likes
+      await tx.feedbackLike.delete({
+        where: {
+          unique_user_feedback_like: {
+            userId,
+            feedbackId
+          }
+        }
+      });
+      
+      // 2. Decrementar likes atomicamente
+      const updatedFeedback = await tx.feedback.update({
+        where: { id: feedbackId },
+        data: {
+          likes: {
+            decrement: 1
+          }
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              nome: true,
+              email: true,
+            }
+          },
+          recipient: {
+            select: {
+              id: true,
+              nome: true,
+              email: true,
+            }
+          }
+        }
+      });
+      
+      return updatedFeedback;
+    });
+    
+    console.log('✅ Like removido! Novo total:', result.likes);
+    
+    // Retornar feedback completo no formato esperado pelo frontend
+    return {
+      ...result,
+      content: result.message,
+      author: result.user || { id: '', nome: result.sender, email: '' },
+      authorId: result.userId,
+      recipientId: result.recipientId,
+      isLikedByCurrentUser: false,
+    } as any;
   }
 
 

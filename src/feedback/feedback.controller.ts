@@ -22,6 +22,7 @@ export class FeedbackController {
     @Query('sender') sender?: string,
     @Query('orderBy') orderBy?: string,
     @Query('order') order?: string,
+    @Request() req?: any,
   ) {
     // Converter strings para números e definir padrões
     const pageNumber = page ? parseInt(page) : 1;        // padrão: página 1
@@ -29,9 +30,13 @@ export class FeedbackController {
     const orderDirection = order || 'desc';               // padrão: mais recentes primeiro
     const sortBy = orderBy || 'createdAt';                // padrão: ordenar por data
 
-    return this.feedbackService.findAll(pageNumber, limitNumber, sender, sortBy, orderDirection);
+    return this.feedbackService.findAll(pageNumber, limitNumber, sender, sortBy, orderDirection, req?.user?.id);
   }
-
+  // 🧪 ENDPOINT DE TESTE - RETORNA TODOS OS FEEDBACKS SEM FILTRO
+  @Get('debug/all')
+  async debugGetAll() {
+    return this.feedbackService.debugGetAllFeedbacks();
+  }
   @Get('sender/:senderId')
   findBysender(@Param('senderId') senderId: string) {
     return this.feedbackService.findBySender(senderId);
@@ -74,6 +79,12 @@ export class FeedbackController {
   @Post(':id/like')
   async likeFeedback(@Param('id') feedbackId: string, @Request() req) {
     return this.feedbackService.likeFeedback(feedbackId, req.user.id);
+  }
+
+  // 👎 ENDPOINT PARA DESCURTIR FEEDBACK
+  @Delete(':id/like')
+  async unlikeFeedback(@Param('id') feedbackId: string, @Request() req) {
+    return this.feedbackService.unlikeFeedback(feedbackId, req.user.id);
   }
 
   

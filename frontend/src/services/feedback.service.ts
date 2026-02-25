@@ -8,7 +8,7 @@ import {
 
 export const feedbackService = {
   async getAll(): Promise<Feedback[]> {
-    const response = await api.get<Feedback[]>('/feedback')
+    const response = await api.get<Feedback[]>('/feedback/debug/all')
     return response.data
   },
 
