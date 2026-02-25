@@ -19,6 +19,12 @@ export class UserController {
    }
 
    @UseGuards(JwtAuthGuard)
+   @Get()
+   async findAll() {
+    return this.userService.findAll();
+   }
+
+   @UseGuards(JwtAuthGuard)
    @Get('profile')
    async getProfile(@Request() req) {
      return {

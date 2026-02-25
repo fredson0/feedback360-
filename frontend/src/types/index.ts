@@ -1,5 +1,5 @@
 export interface User {
-  id: number
+  id: string
   email: string
   nome: string
   createdAt: string
@@ -7,13 +7,13 @@ export interface User {
 }
 
 export interface Feedback {
-  id: number
+  id: string
   content: string
   rating: number
   likes: number
-  authorId: number
+  authorId: string
   author: User
-  recipientId: number
+  recipientId: string
   recipient: User
   createdAt: string
   updatedAt: string
@@ -21,9 +21,9 @@ export interface Feedback {
 }
 
 export interface CreateFeedbackDto {
-  content: string
+  message: string
   rating: number
-  recipientId: number
+  recipientId: string
 }
 
 export interface UpdateFeedbackDto {

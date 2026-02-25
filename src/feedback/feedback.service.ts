@@ -35,6 +35,7 @@ export class FeedbackService {
         userId: user.id,
         sender: user.nome,
         rating: createFeedbackDto.rating || 5,
+        recipientId: createFeedbackDto.recipientId,
       },
     });
     
@@ -72,13 +73,35 @@ export class FeedbackService {
     }
 
     const skip = (page - 1) * limit;
-    const feedback = await this.prisma.feedback.findMany({
+    const feedbacks = await this.prisma.feedback.findMany({
       skip,
       take: limit,
       where,
       orderBy: orderQuery,
+      include: {
+        user: {
+          select: {
+            id: true,
+            nome: true,
+            email: true,
+          }
+        },
+        recipient: {
+          select: {
+            id: true,
+            nome: true,
+            email: true,
+          }
+        }
+      }
     });
-    return feedback;
+    
+    // Mapear para o formato esperado pelo frontend
+    return feedbacks.map(feedback => ({
+      ...feedback,
+      author: feedback.user,
+      authorId: feedback.userId,
+    })) as any;
   }
   
 

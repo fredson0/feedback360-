@@ -1,11 +1,16 @@
-import {IsNotEmpty} from 'class-validator';
+import {IsNotEmpty, IsString, IsOptional, IsNumber, IsUUID} from 'class-validator';
 
 export class CreateFeedbackDto {
   @IsNotEmpty()
-  message:string;
+  @IsString()
+  message: string;
 
+  @IsOptional()
+  @IsNumber()
   rating?: number;
 
-  
+  @IsOptional()
+  @IsUUID()
+  recipientId?: string;
 }
 

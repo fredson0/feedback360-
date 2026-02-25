@@ -8,30 +8,34 @@ datasource db {
 }
 
 model Feedback {
-  id        String         @id @default(uuid())
-  message   String
-  sender    String
-  rating    Int            @default(5)
-  likes     Int            @default(0)
-  createdAt DateTime       @default(now())
-  userId    String?
-  user      User?          @relation(fields: [userId], references: [id])
+  id          String         @id @default(uuid())
+  message     String
+  sender      String
+  rating      Int            @default(5)
+  likes       Int            @default(0)
+  createdAt   DateTime       @default(now())
+  userId      String?
+  user        User?          @relation(name: "UserFeedbacks", fields: [userId], references: [id])
+  
+  recipientId String?
+  recipient   User?          @relation(name: "ReceivedFeedbacks", fields: [recipientId], references: [id])
   
   // Relacionamento com likes recebidos pelo feedback
   feedbackLikes FeedbackLike[]
 }
 
 model User {
-  id        String         @id @default(uuid())
-  nome      String
-  email     String         @unique
-  password  String
-  role      String         @default("USER")
-  isActive  Boolean        @default(true)
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
-  feedbacks Feedback[]
-  likes     FeedbackLike[] // Relacionamento com likes dados pelo usuário
+  id                String         @id @default(uuid())
+  nome              String
+  email             String         @unique
+  password          String
+  role              String         @default("USER")
+  isActive          Boolean        @default(true)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  feedbacks         Feedback[]     @relation(name: "UserFeedbacks")
+  receivedFeedbacks Feedback[]     @relation(name: "ReceivedFeedbacks")
+  likes             FeedbackLike[] // Relacionamento com likes dados pelo usuário
 }
 
 model FeedbackLike {
