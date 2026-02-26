@@ -43,7 +43,7 @@ export function useFeedbacks() {
   async function updateFeedback(id: string, data: UpdateFeedbackDto) {
     try {
       const updated = await feedbackService.update(id, data)
-      setFeedbacks(feedbacks.map(f => f.id === id ? updated : f))
+      setFeedbacks(prev =>prev.map(f => f.id === id ? updated : f))
       toast.success('Feedback atualizado com sucesso!')
       return updated
     } catch (err: any) {

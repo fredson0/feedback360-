@@ -27,6 +27,7 @@ export const feedbackService = {
     return response.data
   },
 
+
   async delete(id: string): Promise<void> {
     await api.delete(`/feedback/${id}`)
   },
