@@ -14,13 +14,16 @@ export default function FeedbacksPage() {
   // 🏠 PÁGINA = DIRETOR DE ORQUESTRA
   
   // ⚡ HOOKS = INSTALAÇÃO ELÉTRICA (traz dados de fora) 
-  const { feedbacks, loading, toggleLike, deleteFeedback } = useFeedbacks()
+  const { feedbacks, loading, toggleLike, deleteFeedback, updateFeedback } = useFeedbacks()
   const { user } = useAuth()
   
   // 💾 ESTADO LOCAL = MEMÓRIA DA PÁGINA (só ela controla)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [searchText, setSearchText] = useState('')  // 🔥 NOVO: Estado de busca
 
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [searchText, setSearchText] = useState('')  // 🔥 Estado de busca
+  const [editingId, setEditingId] = useState<string | null>(null)  // 🔥 NOVO: Estado de edição
+  const [editingRating, setEditingRating] = useState(5)
+  const [editingMessage, setEditingMessage] = useState('')
   // 🧮 COMPUTED VALUE = CÁLCULO AUTOMÁTICO (useMemo)
   const filteredFeedbacks = useMemo(() => {
     // Se não tem nada digitado, mostra tudo
@@ -45,6 +48,26 @@ export default function FeedbacksPage() {
     }
   }
 
+  const handleEdit = (feedbackId: string, currentMessage: string, currentRating: number) => {
+    setEditingId(feedbackId)
+    setEditingMessage(currentMessage)
+    setEditingRating(currentRating)
+  }
+  
+  const handleCancelEdit = () => {
+    setEditingId(null)
+    setEditingMessage('')
+    setEditingRating(5)
+  }
+
+  const handleSaveEdit = async (feedbackId: string) => {
+    try {
+      await updateFeedback(feedbackId, { message: editingMessage, rating: editingRating })
+      handleCancelEdit()
+    } catch (error) {
+      console.error('Erro ao atualizar feedback:', error)
+    }
+  }
   // 🔧 ESTADOS DE CARREGAMENTO = FEEDBACK VISUAL PARA O USUÁRIO
   if (loading) {
     return (
