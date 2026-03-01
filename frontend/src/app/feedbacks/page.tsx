@@ -62,7 +62,7 @@ export default function FeedbacksPage() {
 
   const handleSaveEdit = async (feedbackId: string) => {
     try {
-      await updateFeedback(feedbackId, { message: editingMessage, rating: editingRating })
+      await updateFeedback(feedbackId, { content: editingMessage, rating: editingRating })
       handleCancelEdit()
     } catch (error) {
       console.error('Erro ao atualizar feedback:', error)
@@ -184,6 +184,7 @@ export default function FeedbacksPage() {
                   const isLiked = feedback.isLikedByCurrentUser
                   const authorInitials = feedback.author?.nome?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || '??'
                   const recipientInitials = feedback.recipient?.nome?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || '??'
+                  const isEditing = editingId === feedback.id
 
                   return (
                     <div 
@@ -227,9 +228,31 @@ export default function FeedbacksPage() {
 
                       {/* Message */}
                       <div className="ml-12 mb-4">
-                        <p className="text-gray-600 text-sm leading-relaxed">
-                          {feedback.content || 'Sem mensagem'}
-                        </p>
+                        {isEditing ? (
+                          // 🔥 MODO EDIÇÃO
+                          <div className="space-y-3">
+                            <textarea
+                              value={editingMessage}
+                              onChange={(e) => setEditingMessage(e.target.value)}
+                              className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                              rows={3}
+                            />
+                            <input
+                              type="range"
+                              min="1"
+                              max="5"
+                              value={editingRating}
+                              onChange={(e) => setEditingRating(Number(e.target.value))}
+                              className="w-full"
+                            />
+                            <p className="text-xs text-gray-500">Rating: {editingRating} ⭐</p>
+                          </div>
+                        ) : (
+                          // 👁️ MODO VISUALIZAÇÃO
+                          <p className="text-gray-600 text-sm leading-relaxed">
+                            {feedback.content || 'Sem mensagem'}
+                          </p>
+                        )}
                       </div>
 
                       {/* Footer */}
@@ -256,12 +279,41 @@ export default function FeedbacksPage() {
                         </div>
 
                         {isAuthor && (
-                          <button
-                            onClick={() => handleDelete(feedback.id)}
-                            className="ml-auto text-xs text-red-600 hover:text-red-700 font-medium"
-                          >
-                            Excluir
-                          </button>
+                          <>
+                            {isEditing ? (
+                              // 🔥 MODO EDIÇÃO - Salvar e Cancelar
+                              <>
+                                <button
+                                  onClick={() => handleSaveEdit(feedback.id)}
+                                  className="text-xs text-green-600 hover:text-green-700 font-medium px-3 py-1.5 rounded-md hover:bg-green-50"
+                                >
+                                  Salvar
+                                </button>
+                                <button
+                                  onClick={handleCancelEdit}
+                                  className="text-xs text-gray-600 hover:text-gray-700 font-medium px-3 py-1.5 rounded-md hover:bg-gray-50"
+                                >
+                                  Cancelar
+                                </button>
+                              </>
+                            ) : (
+                              // 👁️ MODO VISUALIZAÇÃO - Editar e Deletar
+                              <>
+                                <button
+                                  onClick={() => handleEdit(feedback.id, feedback.content || '', feedback.rating)}
+                                  className="text-xs text-blue-600 hover:text-blue-700 font-medium px-3 py-1.5 rounded-md hover:bg-blue-50"
+                                >
+                                  Editar
+                                </button>
+                                <button 
+                                  onClick={() => handleDelete(feedback.id)} 
+                                  className="text-xs text-red-600 hover:text-red-700 font-medium px-3 py-1.5 rounded-md hover:bg-red-50"
+                                >
+                                  Excluir
+                                </button>
+                              </>
+                            )}
+                          </>
                         )}
                       </div>
                     </div>
