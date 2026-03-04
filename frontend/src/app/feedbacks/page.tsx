@@ -18,12 +18,12 @@ export default function FeedbacksPage() {
   const { user } = useAuth()
   
   // 💾 ESTADO LOCAL = MEMÓRIA DA PÁGINA (só ela controla)
-
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [searchText, setSearchText] = useState('')  // 🔥 Estado de busca
-  const [editingId, setEditingId] = useState<string | null>(null)  // 🔥 NOVO: Estado de edição
+  const [editingId, setEditingId] = useState<string | null>(null)  // 🔥 Estado de edição
+  const [editingContent, setEditingContent] = useState('')
   const [editingRating, setEditingRating] = useState(5)
-  const [editingMessage, setEditingMessage] = useState('')
+  
   // 🧮 COMPUTED VALUE = CÁLCULO AUTOMÁTICO (useMemo)
   const filteredFeedbacks = useMemo(() => {
     // Se não tem nada digitado, mostra tudo
@@ -48,26 +48,28 @@ export default function FeedbacksPage() {
     }
   }
 
-  const handleEdit = (feedbackId: string, currentMessage: string, currentRating: number) => {
-    setEditingId(feedbackId)
-    setEditingMessage(currentMessage)
-    setEditingRating(currentRating)
+  const handleEdit = (feedback: any) => {
+    setEditingId(feedback.id)
+    setEditingContent(feedback.content || '')
+    setEditingRating(feedback.rating)
   }
-  
-  const handleCancelEdit = () => {
+
+  const handleSavedEdit = async () => {
+    if (!editingId) return
+
+    await updateFeedback(editingId, {content: editingContent, rating: editingRating})
+    
     setEditingId(null)
-    setEditingMessage('')
+    setEditingContent('')
     setEditingRating(5)
   }
 
-  const handleSaveEdit = async (feedbackId: string) => {
-    try {
-      await updateFeedback(feedbackId, { content: editingMessage, rating: editingRating })
-      handleCancelEdit()
-    } catch (error) {
-      console.error('Erro ao atualizar feedback:', error)
-    }
+  const handleCancelEdit = () => {
+    setEditingId(null)
+    setEditingContent('')
+    setEditingRating(5)
   }
+
   // 🔧 ESTADOS DE CARREGAMENTO = FEEDBACK VISUAL PARA O USUÁRIO
   if (loading) {
     return (
