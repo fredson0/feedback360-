@@ -8,7 +8,7 @@ export interface User {
 
 export interface Feedback {
   id: string
-  content: string
+  message?: string  // Campo atual do backend
   rating: number
   likes: number
   authorId: string
@@ -27,7 +27,7 @@ export interface CreateFeedbackDto {
 }
 
 export interface UpdateFeedbackDto {
-  content?: string
+  message?: string
   rating?: number
 }
 
@@ -49,7 +49,7 @@ export interface AuthResponse {
 
 export interface RankingItem {
   id: number
-  content: string
+  message?: string
   rating: number
   likes: number
   score: number

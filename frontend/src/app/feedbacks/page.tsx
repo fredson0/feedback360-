@@ -33,7 +33,7 @@ export default function FeedbacksPage() {
 
     // 🔍 FILTRO: Busca no conteúdo (case-insensitive)
     return feedbacks.filter(feedback => 
-      (feedback.content || '').toLowerCase().includes(searchText.toLowerCase())
+      ((feedback.message || '').toLowerCase().includes(searchText.toLowerCase()))
     )
   }, [feedbacks, searchText]) // 🔄 Recalcula quando mudar feedbacks OU searchText
 
@@ -50,14 +50,14 @@ export default function FeedbacksPage() {
 
   const handleEdit = (feedback: any) => {
     setEditingId(feedback.id)
-    setEditingContent(feedback.content || '')
+    setEditingContent(feedback.message || '')
     setEditingRating(feedback.rating)
   }
 
   const handleSavedEdit = async () => {
     if (!editingId) return
 
-    await updateFeedback(editingId, {content: editingContent, rating: editingRating})
+    await updateFeedback(editingId, {message: editingContent, rating: editingRating})
     
     setEditingId(null)
     setEditingContent('')
@@ -234,9 +234,9 @@ export default function FeedbacksPage() {
                           // 🔥 MODO EDIÇÃO
                           <div className="space-y-3">
                             <textarea
-                              value={editingMessage}
-                              onChange={(e) => setEditingMessage(e.target.value)}
-                              className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                              value={editingContent}
+                              onChange={(e) => setEditingContent(e.target.value)}
+                              className="w-full border border-gray-300 rounded-md p-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                               rows={3}
                             />
                             <input
@@ -245,14 +245,14 @@ export default function FeedbacksPage() {
                               max="5"
                               value={editingRating}
                               onChange={(e) => setEditingRating(Number(e.target.value))}
-                              className="w-full"
+                              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
                             />
                             <p className="text-xs text-gray-500">Rating: {editingRating} ⭐</p>
                           </div>
                         ) : (
                           // 👁️ MODO VISUALIZAÇÃO
                           <p className="text-gray-600 text-sm leading-relaxed">
-                            {feedback.content || 'Sem mensagem'}
+                            {feedback.message || 'Sem mensagem'}
                           </p>
                         )}
                       </div>
@@ -286,7 +286,7 @@ export default function FeedbacksPage() {
                               // 🔥 MODO EDIÇÃO - Salvar e Cancelar
                               <>
                                 <button
-                                  onClick={() => handleSaveEdit(feedback.id)}
+                                  onClick={handleSavedEdit}
                                   className="text-xs text-green-600 hover:text-green-700 font-medium px-3 py-1.5 rounded-md hover:bg-green-50"
                                 >
                                   Salvar
@@ -302,7 +302,7 @@ export default function FeedbacksPage() {
                               // 👁️ MODO VISUALIZAÇÃO - Editar e Deletar
                               <>
                                 <button
-                                  onClick={() => handleEdit(feedback.id, feedback.content || '', feedback.rating)}
+                                  onClick={() => handleEdit(feedback)}
                                   className="text-xs text-blue-600 hover:text-blue-700 font-medium px-3 py-1.5 rounded-md hover:bg-blue-50"
                                 >
                                   Editar

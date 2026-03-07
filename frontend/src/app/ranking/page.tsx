@@ -94,7 +94,7 @@ export default function RankingPage() {
                         </span>
                       </div>
 
-                      <p className="text-gray-700 mb-3">{item.content}</p>
+                      <p className="text-gray-700 mb-3">{item.message}</p>
 
                       <div className="flex items-center space-x-4">
                         <Badge variant="warning">
