@@ -10,9 +10,10 @@ export function Header() {
   const pathname = usePathname()
   const { user, logout } = useAuth()
 
+  // Agora a navegação é dinâmica e usa o ID do usuário!
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Feedbacks', href: '/feedbacks', icon: MessageSquare },
+    { name: 'Feedbacks', href: user?.id ? `/people/${user.id}/feedbacks` : '/feedbacks', icon: MessageSquare },
     { name: 'Ranking', href: '/ranking', icon: Trophy },
     { name: 'Perfil', href: '/profile', icon: User },
   ]
