@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { LogOut, User, LayoutDashboard, MessageSquare, Trophy, Sparkles } from 'lucide-react'
@@ -9,6 +10,13 @@ export function Header() {
   const pathname = usePathname()
   const router = useRouter()
   const { user, logout } = useAuth()
+  const [profileImage, setProfileImage] = useState<string | null>(null)
+
+  useEffect(() => {
+    const storageKey = `profileImage:${user?.id ?? 'me'}`
+    const storedImage = localStorage.getItem(storageKey)
+    setProfileImage(storedImage)
+  }, [user?.id])
 
   // Agora a navegação é dinâmica e usa o ID do usuário!
   const navigation = [
@@ -31,8 +39,12 @@ export function Header() {
             Feedback360
           </Link>
           <div className="flex items-center gap-2 text-sm text-slate-600">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100">
-              <User className="h-4 w-4" />
+            <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-slate-100">
+              {profileImage ? (
+                <img src={profileImage} alt="Foto do perfil" className="h-full w-full object-cover" />
+              ) : (
+                <User className="h-4 w-4" />
+              )}
             </div>
             <span className="max-w-[120px] truncate">{user?.nome}</span>
             <button
@@ -110,8 +122,12 @@ export function Header() {
             </div>
             <div className="mt-4 flex items-center justify-between rounded-2xl bg-white/10 px-4 py-3">
               <div className="flex items-center gap-2 text-sm">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
-                  <User className="h-4 w-4" />
+                <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-white/20">
+                  {profileImage ? (
+                    <img src={profileImage} alt="Foto do perfil" className="h-full w-full object-cover" />
+                  ) : (
+                    <User className="h-4 w-4" />
+                  )}
                 </div>
                 <span className="max-w-[120px] truncate">{user?.nome}</span>
               </div>

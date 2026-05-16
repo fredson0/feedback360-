@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Sora } from 'next/font/google'
 import { DashboardLayout, Container } from '@/components/layout'
 import { Button, Input } from '@/components/ui'
@@ -22,6 +22,8 @@ export default function FeedbacksPage() {
   // ⚡ HOOKS = INSTALAÇÃO ELÉTRICA (traz dados de fora) 
   const { feedbacks, loading, toggleLike, deleteFeedback, updateFeedback } = useFeedbacks()
   const { user } = useAuth()
+
+  const [profileImage, setProfileImage] = useState<string | null>(null)
   
   // 💾 ESTADO LOCAL = MEMÓRIA DA PÁGINA (só ela controla)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -75,6 +77,12 @@ export default function FeedbacksPage() {
     setEditingContent('')
     setEditingRating(5)
   }
+
+  useEffect(() => {
+    const storageKey = `profileImage:${user?.id ?? 'me'}`
+    const storedImage = localStorage.getItem(storageKey)
+    setProfileImage(storedImage)
+  }, [user?.id])
 
   // 🔧 ESTADOS DE CARREGAMENTO = FEEDBACK VISUAL PARA O USUÁRIO
   if (loading) {
@@ -200,8 +208,12 @@ export default function FeedbacksPage() {
                     >
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-fuchsia-500 rounded-2xl flex items-center justify-center text-white font-medium text-xs flex-shrink-0">
-                            {authorInitials}
+                          <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-fuchsia-500 rounded-2xl flex items-center justify-center overflow-hidden text-white font-medium text-xs flex-shrink-0">
+                            {isAuthor && profileImage ? (
+                              <img src={profileImage} alt="Foto do perfil" className="h-full w-full object-cover" />
+                            ) : (
+                              authorInitials
+                            )}
                           </div>
                           
                           <div className="flex-1">

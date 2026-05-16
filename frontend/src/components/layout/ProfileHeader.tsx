@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 
@@ -13,6 +13,13 @@ interface ProfileHeaderProps {
 
 export function ProfileHeader({ userName, userRole, userAvatar, id }: ProfileHeaderProps) {
   const pathname = usePathname();
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storageKey = `profileImage:${id ?? 'me'}`;
+    const storedImage = localStorage.getItem(storageKey);
+    setProfileImage(storedImage);
+  }, [id]);
 
   const isActive = (route: string) => pathname.includes(route);
   const getTabClass = (route: string) => 
@@ -31,8 +38,16 @@ export function ProfileHeader({ userName, userRole, userAvatar, id }: ProfileHea
         {/* Lado Esquerdo: Avatar + Info */}
         <div className="flex items-center gap-4">
           {/* Avatar */}
-          <div className="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-xl">
-            {userName.charAt(0).toUpperCase()}
+          <div className="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-xl overflow-hidden">
+            {profileImage || userAvatar ? (
+              <img
+                src={profileImage || userAvatar}
+                alt="Foto do perfil"
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              userName.charAt(0).toUpperCase()
+            )}
           </div>
           
           {/* Info */}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Sora } from 'next/font/google'
 import { DashboardLayout, Container } from "@/components/layout"
 import { Card, CardContent, Badge } from "@/components/ui"
@@ -15,7 +15,38 @@ const sora = Sora({
 export default function ProfilePage() {
   const { user } = useAuth()
   const [activeTab, setActiveTab] = useState('about')
+  const [profileImage, setProfileImage] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
   const ratingHistory = [3.2, 3.1, 3.4, 3.5, 3.3, 3.4, 3.6] // Exemplo de dados históricos de rating
+
+  useEffect(() => {
+    const storageKey = `profileImage:${user?.id ?? 'me'}`
+    const storedImage = localStorage.getItem(storageKey)
+    if (storedImage) {
+      setProfileImage(storedImage)
+    }
+  }, [user?.id])
+
+  const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      const result = typeof reader.result === 'string' ? reader.result : null
+      if (!result) return
+      const storageKey = `profileImage:${user?.id ?? 'me'}`
+      localStorage.setItem(storageKey, result)
+      setProfileImage(result)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleRemovePhoto = () => {
+    const storageKey = `profileImage:${user?.id ?? 'me'}`
+    localStorage.removeItem(storageKey)
+    setProfileImage(null)
+  }
 
   return (
     <DashboardLayout>
@@ -31,8 +62,16 @@ export default function ProfilePage() {
                 <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center sm:space-x-6">
                   <div className="flex-shrink-0">
                     <div className="rounded-2xl bg-white/15 p-4 shadow-lg">
-                      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/20 text-3xl font-bold">
-                        {user?.nome?.substring(0, 2).toUpperCase() || 'JA'}
+                      <div className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-white/20 text-3xl font-bold">
+                        {profileImage ? (
+                          <img
+                            src={profileImage}
+                            alt="Foto do perfil"
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <span>{user?.nome?.substring(0, 2).toUpperCase() || 'JA'}</span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -45,9 +84,36 @@ export default function ProfilePage() {
                     <p className="text-white/80 text-sm mt-1 font-medium">Desenvolvedor Backend</p>
                     <p className="text-white/70 text-sm mt-1">{user?.email || 'jaozinho123@gmail.com'}</p>
                   </div>
-                  <div className="flex items-center gap-3 rounded-2xl bg-white/15 px-4 py-3 text-sm">
-                    <Sparkles className="h-4 w-4" />
-                    Membro desde 2024
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex items-center gap-3 rounded-2xl bg-white/15 px-4 py-3 text-sm">
+                      <Sparkles className="h-4 w-4" />
+                      Membro desde 2024
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoChange}
+                        className="hidden"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="rounded-full bg-white/20 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-white/30"
+                      >
+                        {profileImage ? 'Trocar foto' : 'Adicionar foto'}
+                      </button>
+                      {profileImage && (
+                        <button
+                          type="button"
+                          onClick={handleRemovePhoto}
+                          className="rounded-full bg-white/10 px-4 py-2 text-xs font-semibold text-white/80 transition-colors hover:bg-white/20"
+                        >
+                          Remover
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

@@ -19,6 +19,7 @@ export default function FeedbacksPage() {
   const feedbacks = [
     {
       author: 'Ana Lima',
+      photo: '',
       message: 'Excelente colaboracao no sprint 4, trouxe clareza para o time.',
       rating: 5,
       likes: 12,
@@ -26,6 +27,7 @@ export default function FeedbacksPage() {
     },
     {
       author: 'Carlos Monteiro',
+      photo: '',
       message: 'Feedback objetivo e com boas sugestoes de melhoria.',
       rating: 4,
       likes: 6,
@@ -33,12 +35,21 @@ export default function FeedbacksPage() {
     },
     {
       author: 'Helena Souza',
+      photo: '',
       message: 'Otima comunicacao com stakeholders e time.',
       rating: 4.5,
       likes: 9,
       time: '3d',
     },
   ]
+
+  const getInitials = (name: string) =>
+    name
+      .split(' ')
+      .map((part) => part[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase()
 
   return (
     <div className={sora.className}>
@@ -74,9 +85,18 @@ export default function FeedbacksPage() {
               className="rounded-3xl border border-white/70 bg-white/70 p-5 shadow-lg shadow-indigo-100/30 backdrop-blur"
             >
               <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm font-semibold text-slate-900">{feedback.author}</p>
-                  <p className="text-xs text-slate-500">Feedback recente</p>
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 overflow-hidden rounded-full bg-indigo-500 text-sm font-semibold text-white flex items-center justify-center">
+                    {feedback.photo ? (
+                      <img src={feedback.photo} alt={feedback.author} className="h-full w-full object-cover" />
+                    ) : (
+                      getInitials(feedback.author)
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">{feedback.author}</p>
+                    <p className="text-xs text-slate-500">Feedback recente</p>
+                  </div>
                 </div>
                 <span className="text-xs text-slate-400">{feedback.time}</span>
               </div>
