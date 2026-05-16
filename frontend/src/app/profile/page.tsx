@@ -1,10 +1,16 @@
 'use client'
 
 import { useState } from 'react'
+import { Sora } from 'next/font/google'
 import { DashboardLayout, Container } from "@/components/layout"
 import { Card, CardContent, Badge } from "@/components/ui"
 import { useAuth } from '@/contexts/AuthContext'
-import { Calendar, User, TrendingUp, CheckCircle } from 'lucide-react'
+import { Calendar, User, TrendingUp, CheckCircle, Sparkles, Star } from 'lucide-react'
+
+const sora = Sora({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+})
 
 export default function ProfilePage() {
   const { user } = useAuth()
@@ -13,46 +19,48 @@ export default function ProfilePage() {
 
   return (
     <DashboardLayout>
-      {/* Fundo verde claro da página toda */}
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 py-8">
+      <div className={`min-h-screen py-8 ${sora.className}`}>
         <Container>
           <div className="max-w-5xl mx-auto">
             
-            {/* Card Principal com borda colorida */}
-            <Card className="overflow-hidden shadow-xl border-t-4 border-emerald-400">
+            <Card className="overflow-hidden rounded-[28px] border border-white/30 bg-white/35 shadow-2xl shadow-indigo-200/30 backdrop-blur">
               
-              {/* Header com foto À ESQUERDA e info AO LADO */}
-              <div className="bg-gradient-to-r from-teal-100 via-emerald-100 to-cyan-100 p-8">
-                <div className="flex items-center space-x-6">
-                  {/* Avatar à esquerda - card branco com sombra */}
+              <div className="relative overflow-hidden bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-500 p-8 text-white">
+                <div className="pointer-events-none absolute -right-20 -top-16 h-56 w-56 rounded-full bg-white/15 blur-2xl" />
+                <div className="pointer-events-none absolute -bottom-16 left-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
+                <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center sm:space-x-6">
                   <div className="flex-shrink-0">
-                    <div className="bg-white rounded-2xl p-4 shadow-lg">
-                      <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center text-3xl font-bold text-white">
+                    <div className="rounded-2xl bg-white/15 p-4 shadow-lg">
+                      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/20 text-3xl font-bold">
                         {user?.nome?.substring(0, 2).toUpperCase() || 'JA'}
                       </div>
                     </div>
                   </div>
                   
-                  {/* Nome e cargo ao lado */}
                   <div className="flex-1">
-                    <h1 className="text-3xl font-bold text-gray-900">
+                    <p className="text-xs uppercase tracking-[0.4em] text-white/70">Perfil</p>
+                    <h1 className="mt-2 text-3xl font-semibold">
                       {user?.nome || 'jaozinho'}
                     </h1>
-                    <p className="text-teal-700 text-base mt-1 font-medium">Desenvolvedor Backend</p>
-                    <p className="text-teal-600 text-sm mt-1">{user?.email || 'jaozinho123@gmail.com'}</p>
+                    <p className="text-white/80 text-sm mt-1 font-medium">Desenvolvedor Backend</p>
+                    <p className="text-white/70 text-sm mt-1">{user?.email || 'jaozinho123@gmail.com'}</p>
+                  </div>
+                  <div className="flex items-center gap-3 rounded-2xl bg-white/15 px-4 py-3 text-sm">
+                    <Sparkles className="h-4 w-4" />
+                    Membro desde 2024
                   </div>
                 </div>
               </div>
 
               {/* Tabs - mesma linha, dentro do card */}
-              <div className="border-b border-gray-200 bg-white">
+              <div className="border-b border-slate-200 bg-white/50">
                 <div className="flex">
                   <button
                     onClick={() => setActiveTab('about')}
-                    className={`flex-1 px-6 py-3 text-sm font-medium transition-all ${
+                    className={`flex-1 px-6 py-3 text-sm font-semibold transition-all ${
                       activeTab === 'about'
-                        ? 'text-emerald-600 border-b-2 border-emerald-500 bg-emerald-50'
-                        : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                        ? 'text-indigo-600 border-b-2 border-indigo-500 bg-indigo-50'
+                        : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
                     }`}
                   >
                     <User className="w-4 h-4 inline mr-2" />
@@ -60,10 +68,10 @@ export default function ProfilePage() {
                   </button>
                   <button
                     onClick={() => setActiveTab('agenda')}
-                    className={`flex-1 px-6 py-3 text-sm font-medium transition-all ${
+                    className={`flex-1 px-6 py-3 text-sm font-semibold transition-all ${
                       activeTab === 'agenda'
-                        ? 'text-emerald-600 border-b-2 border-emerald-500 bg-emerald-50'
-                        : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                        ? 'text-indigo-600 border-b-2 border-indigo-500 bg-indigo-50'
+                        : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
                     }`}
                   >
                     <Calendar className="w-4 h-4 inline mr-2" />
@@ -73,7 +81,7 @@ export default function ProfilePage() {
               </div>
 
               {/* Conteúdo - tudo dentro do mesmo card */}
-              <CardContent className="p-6 bg-white">
+              <CardContent className="p-6 bg-white/50">
                 
                 {/* Tab: Sobre Mim */}
                 {activeTab === 'about' && (
@@ -83,13 +91,13 @@ export default function ProfilePage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       
                       {/* Rating */}
-                      <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl p-5 border border-yellow-200 shadow-sm">
-                        <p className="text-xs text-gray-600 mb-2">Rating Geral</p>
+                      <div className="rounded-2xl border border-indigo-100 bg-gradient-to-br from-indigo-50 via-white to-fuchsia-50 p-5 shadow-sm">
+                        <p className="text-xs text-slate-500 mb-2">Rating Geral</p>
                         <div className="flex items-center justify-between">
-                          <p className="text-4xl font-bold text-amber-600">3.4</p>
-                          <div className="text-5xl">⭐</div>
+                          <p className="text-4xl font-semibold text-indigo-600">3.4</p>
+                          <Star className="h-10 w-10 text-fuchsia-500" />
                         </div>
-                        <div className="mt-2 flex items-center text-xs text-green-600">
+                        <div className="mt-2 flex items-center text-xs text-emerald-600">
                           <TrendingUp className="w-3 h-3 mr-1" />
                           +0.2 este mês
                         </div>
@@ -103,43 +111,43 @@ export default function ProfilePage() {
                         
                         {/* ESPAÇO PARA O GRÁFICO - VOCÊ VAI ADICIONAR AQUI */}
 
-                        <div className="mt-3 h-12 bg-amber-100 rounded flex items-center justify-center">
-                          <span className="text-xs text-gray-500">Gráfico aqui</span>
+                        <div className="mt-3 h-12 rounded-xl bg-indigo-100/70 flex items-center justify-center">
+                          <span className="text-xs text-slate-500">Gráfico aqui</span>
                         </div>
                         
                       </div>
 
                       {/* Status */}
-                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 border border-green-200 shadow-sm">
-                        <p className="text-xs text-gray-600 mb-2">Status</p>
+                      <div className="rounded-2xl border border-violet-100 bg-gradient-to-br from-violet-50 via-white to-indigo-50 p-5 shadow-sm">
+                        <p className="text-xs text-slate-500 mb-2">Status</p>
                         <div className="flex items-center justify-between mb-2">
-                          <Badge className="bg-green-100 text-green-700 border-green-300 px-3 py-1">
+                          <Badge className="bg-indigo-100 text-indigo-700 border-indigo-300 px-3 py-1">
                             <span className="mr-1">😊</span> Good
                           </Badge>
-                          <CheckCircle className="w-8 h-8 text-green-500" />
+                          <CheckCircle className="w-8 h-8 text-indigo-500" />
                         </div>
-                        <p className="text-xs text-gray-500">Performance acima da média</p>
+                        <p className="text-xs text-slate-500">Performance acima da média</p>
                       </div>
 
                       {/* Total Feedbacks */}
-                      <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl p-5 border border-purple-200 shadow-sm">
-                        <p className="text-xs text-gray-600 mb-2">Feedbacks</p>
+                      <div className="rounded-2xl border border-fuchsia-100 bg-gradient-to-br from-fuchsia-50 via-white to-indigo-50 p-5 shadow-sm">
+                        <p className="text-xs text-slate-500 mb-2">Feedbacks</p>
                         <div className="flex items-center justify-between">
-                          <p className="text-4xl font-bold text-purple-600">24</p>
-                          <div className="text-5xl">💬</div>
+                          <p className="text-4xl font-semibold text-fuchsia-600">24</p>
+                          <div className="text-4xl">💬</div>
                         </div>
-                        <p className="text-xs text-gray-500 mt-2">Recebidos este trimestre</p>
+                        <p className="text-xs text-slate-500 mt-2">Recebidos este trimestre</p>
                       </div>
 
                     </div>
 
                     {/* Pergunta Contextual com emoji */}
-                    <div className="bg-purple-50 border-l-4 border-purple-400 rounded-lg p-4 shadow-sm">
-                      <p className="text-sm font-semibold text-purple-900 mb-2 flex items-center">
+                    <div className="rounded-2xl border border-indigo-100 bg-indigo-50/80 p-4 shadow-sm">
+                      <p className="text-sm font-semibold text-indigo-900 mb-2 flex items-center">
                         <span className="text-xl mr-2">💭</span>
                         O que você focou esta semana?
                       </p>
-                      <p className="text-sm text-gray-700 leading-relaxed">
+                      <p className="text-sm text-slate-700 leading-relaxed">
                         Desenvolvimento de APIs REST, refatoração do sistema de autenticação 
                         e implementação de testes automatizados.
                       </p>
@@ -147,17 +155,17 @@ export default function ProfilePage() {
 
                     {/* Informações do perfil */}
                     <div className="space-y-1">
-                      <div className="flex justify-between py-3 border-b border-gray-100">
-                        <span className="text-sm text-gray-600">Departamento</span>
-                        <span className="text-sm font-semibold text-gray-900">Tecnologia</span>
+                      <div className="flex justify-between py-3 border-b border-slate-100">
+                        <span className="text-sm text-slate-500">Departamento</span>
+                        <span className="text-sm font-semibold text-slate-900">Tecnologia</span>
                       </div>
-                      <div className="flex justify-between py-3 border-b border-gray-100">
-                        <span className="text-sm text-gray-600">Data de entrada</span>
-                        <span className="text-sm font-semibold text-gray-900">Janeiro 2024</span>
+                      <div className="flex justify-between py-3 border-b border-slate-100">
+                        <span className="text-sm text-slate-500">Data de entrada</span>
+                        <span className="text-sm font-semibold text-slate-900">Janeiro 2024</span>
                       </div>
-                      <div className="flex justify-between py-3 border-b border-gray-100">
-                        <span className="text-sm text-gray-600">Localização</span>
-                        <span className="text-sm font-semibold text-gray-900">Remoto - Brasil</span>
+                      <div className="flex justify-between py-3 border-b border-slate-100">
+                        <span className="text-sm text-slate-500">Localização</span>
+                        <span className="text-sm font-semibold text-slate-900">Remoto - Brasil</span>
                       </div>
                     </div>
 
@@ -171,73 +179,73 @@ export default function ProfilePage() {
                     {/* Lista de tarefas - estilo Lattice */}
                     <div className="space-y-2">
                       
-                      <label className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition cursor-pointer group">
+                      <label className="flex items-center space-x-3 p-3 rounded-xl hover:bg-indigo-50/60 transition cursor-pointer group">
                         <input 
                           type="checkbox" 
-                          className="w-5 h-5 text-emerald-500 rounded border-gray-300 focus:ring-emerald-500" 
+                          className="w-5 h-5 text-indigo-500 rounded border-slate-300 focus:ring-indigo-500" 
                         />
                         <div className="flex-1">
                           <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium text-gray-900">Como você está se sentindo?</span>
+                            <span className="text-sm font-medium text-slate-900">Como você está se sentindo?</span>
                           </div>
-                          <p className="text-xs text-gray-500 mt-0.5">Check-in semanal de bem-estar</p>
+                          <p className="text-xs text-slate-500 mt-0.5">Check-in semanal de bem-estar</p>
                         </div>
                       </label>
 
-                      <label className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition cursor-pointer group">
+                      <label className="flex items-center space-x-3 p-3 rounded-xl hover:bg-indigo-50/60 transition cursor-pointer group">
                         <input 
                           type="checkbox" 
-                          className="w-5 h-5 text-emerald-500 rounded border-gray-300 focus:ring-emerald-500" 
+                          className="w-5 h-5 text-indigo-500 rounded border-slate-300 focus:ring-indigo-500" 
                         />
                         <div className="flex-1">
                           <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium text-gray-900">Suas prioridades este trimestre</span>
+                            <span className="text-sm font-medium text-slate-900">Suas prioridades este trimestre</span>
                             <div className="flex -space-x-1">
-                              <div className="w-6 h-6 rounded-full bg-blue-400 border-2 border-white flex items-center justify-center text-xs text-white font-semibold">
+                              <div className="w-6 h-6 rounded-full bg-indigo-500 border-2 border-white flex items-center justify-center text-xs text-white font-semibold">
                                 M
                               </div>
-                              <div className="w-6 h-6 rounded-full bg-purple-400 border-2 border-white flex items-center justify-center text-xs text-white font-semibold">
+                              <div className="w-6 h-6 rounded-full bg-fuchsia-500 border-2 border-white flex items-center justify-center text-xs text-white font-semibold">
                                 A
                               </div>
                             </div>
                           </div>
-                          <p className="text-xs text-gray-500 mt-0.5">Reunião com gestor e RH</p>
+                          <p className="text-xs text-slate-500 mt-0.5">Reunião com gestor e RH</p>
                         </div>
                       </label>
 
-                      <label className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition cursor-pointer group">
+                      <label className="flex items-center space-x-3 p-3 rounded-xl hover:bg-indigo-50/60 transition cursor-pointer group">
                         <input 
                           type="checkbox" 
                           defaultChecked
-                          className="w-5 h-5 text-emerald-500 rounded border-gray-300 focus:ring-emerald-500" 
+                          className="w-5 h-5 text-indigo-500 rounded border-slate-300 focus:ring-indigo-500" 
                         />
                         <div className="flex-1">
                           <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium text-gray-500 line-through">Aplicar feedback sobre comunicação assertiva</span>
+                            <span className="text-sm font-medium text-slate-500 line-through">Aplicar feedback sobre comunicação assertiva</span>
                           </div>
-                          <p className="text-xs text-gray-400 mt-0.5">✓ Concluído</p>
+                          <p className="text-xs text-slate-400 mt-0.5">✓ Concluído</p>
                         </div>
                       </label>
 
-                      <label className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition cursor-pointer group">
+                      <label className="flex items-center space-x-3 p-3 rounded-xl hover:bg-indigo-50/60 transition cursor-pointer group">
                         <input 
                           type="checkbox" 
-                          className="w-5 h-5 text-emerald-500 rounded border-gray-300 focus:ring-emerald-500" 
+                          className="w-5 h-5 text-indigo-500 rounded border-slate-300 focus:ring-indigo-500" 
                         />
                         <div className="flex-1">
                           <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium text-gray-900">Enviar feedback para 3 colegas</span>
+                            <span className="text-sm font-medium text-slate-900">Enviar feedback para 3 colegas</span>
                           </div>
-                          <p className="text-xs text-gray-500 mt-0.5">Meta mensal de desenvolvimento do time</p>
+                          <p className="text-xs text-slate-500 mt-0.5">Meta mensal de desenvolvimento do time</p>
                         </div>
                       </label>
 
                       {/* Add talking point */}
-                      <button className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition w-full text-left">
+                      <button className="flex items-center space-x-3 p-3 rounded-xl hover:bg-indigo-50/60 transition w-full text-left">
                         <div className="w-5 h-5 flex items-center justify-center">
-                          <span className="text-gray-400 text-xl leading-none">+</span>
+                          <span className="text-slate-400 text-xl leading-none">+</span>
                         </div>
-                        <span className="text-sm text-gray-500">Adicionar ponto de conversa</span>
+                        <span className="text-sm text-slate-500">Adicionar ponto de conversa</span>
                       </button>
 
                     </div>

@@ -7,17 +7,19 @@ export default function PeopleLayout({ children, params }: { children: React.Rea
   const { user } = useAuth();
 
   return (
-    <div>
+    <div className="min-h-screen">
       <Header />
-      <ProfileHeader 
-        id={params.id}
-        userName={user?.nome || 'User'} 
-        userRole={user?.email || 'Role'} 
-        userAvatar={user?.avatar}
-      />
-      <div className="bg-white min-h-screen">
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          {children}
+      <div className="lg:pl-72">
+        <ProfileHeader 
+          id={params.id}
+          userName={user?.nome || 'User'} 
+          userRole={user?.email || 'Role'} 
+          userAvatar={user?.avatar}
+        />
+        <div className="bg-transparent min-h-screen">
+          <div className="max-w-6xl mx-auto px-4 pb-8 pt-12">
+            {children}
+          </div>
         </div>
       </div>
     </div>

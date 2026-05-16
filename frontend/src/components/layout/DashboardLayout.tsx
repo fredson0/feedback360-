@@ -16,9 +16,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-transparent">
       <Header />
-      <main className="py-6">
+      <main className="py-6 lg:pl-72">
         {children}
       </main>
     </div>
