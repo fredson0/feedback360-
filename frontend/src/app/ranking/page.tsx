@@ -1,129 +1,151 @@
 'use client'
 
+import { useMemo, useState } from 'react'
+import { Sora } from 'next/font/google'
 import { DashboardLayout, Container } from '@/components/layout'
-import { Card, Badge } from '@/components/ui'
+import { Card } from '@/components/ui'
 import { useRanking } from '@/hooks'
-import { Trophy, Star, ThumbsUp, TrendingUp } from 'lucide-react'
+import { Trophy, Star, ThumbsUp, TrendingUp, Sparkles } from 'lucide-react'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
+const sora = Sora({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+})
+
 export default function RankingPage() {
   const { ranking, loading } = useRanking()
+  const [period, setPeriod] = useState<'7d' | '30d' | '90d'>('30d')
 
-  if (loading) {
-    return (
-      <DashboardLayout>
-        <Container>
-          <div className="animate-pulse space-y-4">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="h-32 bg-gray-200 rounded"></div>
-            ))}
-          </div>
-        </Container>
-      </DashboardLayout>
-    )
-  }
+  const topRanking = useMemo(() => ranking.slice(0, 3), [ranking])
+  const restRanking = useMemo(() => ranking.slice(3), [ranking])
 
-  const getMedalColor = (position: number) => {
-    if (position === 0) return 'text-yellow-500'
-    if (position === 1) return 'text-gray-400'
-    if (position === 2) return 'text-orange-600'
-    return 'text-gray-600'
-  }
-
-  const getMedalBg = (position: number) => {
-    if (position === 0) return 'bg-yellow-50 border-yellow-200'
-    if (position === 1) return 'bg-gray-50 border-gray-200'
-    if (position === 2) return 'bg-orange-50 border-orange-200'
-    return ''
-  }
+  const periodLabel = period === '7d' ? 'Ultimos 7 dias' : period === '90d' ? 'Ultimos 90 dias' : 'Ultimos 30 dias'
+  const getPeriodClass = (value: typeof period) =>
+    value === period
+      ? 'bg-indigo-600 text-white'
+      : 'bg-white/70 text-slate-600 hover:bg-white'
 
   return (
     <DashboardLayout>
-      <Container>
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-              <Trophy className="w-8 h-8 mr-3 text-yellow-500" />
-              Ranking de Feedbacks
-            </h1>
-            <p className="mt-2 text-gray-600">
-              Feedbacks mais bem avaliados e curtidos da plataforma
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            {ranking.length === 0 ? (
-              <Card>
-                <div className="text-center py-12">
-                  <p className="text-gray-500">Nenhum feedback no ranking ainda</p>
+      <div className={sora.className}>
+        <Container>
+          <div className="space-y-6">
+            <div className="flex flex-col gap-4 rounded-[28px] border border-white/60 bg-white/70 p-6 shadow-xl shadow-indigo-100/40 backdrop-blur sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.4em] text-indigo-500">Ranking</p>
+                <h1 className="mt-2 text-2xl font-semibold text-slate-900 flex items-center gap-2">
+                  <Trophy className="h-6 w-6 text-yellow-400" />
+                  Ranking de Feedbacks
+                </h1>
+                <p className="mt-1 text-sm text-slate-500">Reconhecimentos mais relevantes da plataforma.</p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                {(['7d', '30d', '90d'] as const).map((value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setPeriod(value)}
+                    className={`rounded-full px-4 py-2 text-xs font-semibold transition-colors ${getPeriodClass(value)}`}
+                  >
+                    {value === '7d' ? '7d' : value === '90d' ? '90d' : '30d'}
+                  </button>
+                ))}
+                <div className="flex items-center gap-2 rounded-2xl bg-indigo-50 px-4 py-2 text-xs font-semibold text-indigo-600">
+                  <Sparkles className="h-4 w-4" />
+                  {periodLabel}
                 </div>
+              </div>
+            </div>
+
+            {loading ? (
+              <div className="animate-pulse space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-32 rounded-3xl border border-slate-200/60 bg-white/60"></div>
+                ))}
+              </div>
+            ) : ranking.length === 0 ? (
+              <Card className="rounded-3xl border border-slate-200/60 bg-white/70 p-12 text-center shadow-sm">
+                <p className="text-slate-500">Nenhum feedback no ranking ainda</p>
               </Card>
             ) : (
-              ranking.map((item, index) => (
-                <Card 
-                  key={item.id} 
-                  hoverable
-                  className={`border-2 ${getMedalBg(index)}`}
-                >
-                  <div className="flex items-start space-x-4">
-                    {/* Posição */}
-                    <div className="flex-shrink-0">
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                        index < 3 ? 'bg-white shadow-md' : 'bg-gray-100'
-                      }`}>
-                        {index < 3 ? (
-                          <Trophy className={`w-6 h-6 ${getMedalColor(index)}`} />
-                        ) : (
-                          <span className="text-lg font-bold text-gray-600">
-                            {index + 1}
+              <>
+                <div className="grid gap-4 md:grid-cols-3">
+                  {topRanking.map((item, index) => (
+                    <div
+                      key={item.id}
+                      className="rounded-3xl border border-white/70 bg-white/75 p-5 shadow-lg shadow-indigo-100/40 backdrop-blur"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-slate-500">Top {index + 1}</span>
+                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-r from-yellow-400 via-orange-400 to-amber-400 text-white">
+                          <Trophy className="h-5 w-5" />
+                        </div>
+                      </div>
+                      <div className="mt-4">
+                        <p className="text-sm font-semibold text-slate-900">{item.author?.nome ?? 'Sem autor'}</p>
+                        <p className="text-xs text-slate-500">para {item.recipient?.nome ?? 'Sem destinatario'}</p>
+                      </div>
+                      <p className="mt-3 text-sm text-slate-600 line-clamp-3">{item.message}</p>
+                      <div className="mt-4 flex items-center gap-3 text-xs text-slate-500">
+                        <div className="flex items-center gap-1">
+                          <Star className="h-3.5 w-3.5 text-fuchsia-500" />
+                          {item.rating}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <ThumbsUp className="h-3.5 w-3.5 text-indigo-500" />
+                          {item.likes}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />
+                          {item.score}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="rounded-3xl border border-white/70 bg-white/70 shadow-lg shadow-indigo-100/30 backdrop-blur">
+                  <div className="grid gap-4 p-6">
+                    {restRanking.map((item, index) => (
+                      <div key={item.id} className="flex flex-col gap-3 rounded-2xl border border-slate-100 bg-white/80 p-4 md:flex-row md:items-center md:justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-100 text-sm font-semibold text-slate-600">
+                            {index + 4}
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-slate-900">{item.author?.nome ?? 'Sem autor'}</p>
+                            <p className="text-xs text-slate-500">para {item.recipient?.nome ?? 'Sem destinatario'}</p>
+                          </div>
+                        </div>
+                        <p className="text-sm text-slate-600 md:max-w-xl">{item.message}</p>
+                        <div className="flex items-center gap-3 text-xs text-slate-500">
+                          <div className="flex items-center gap-1">
+                            <Star className="h-3.5 w-3.5 text-fuchsia-500" />
+                            {item.rating}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <ThumbsUp className="h-3.5 w-3.5 text-indigo-500" />
+                            {item.likes}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />
+                            {item.score}
+                          </div>
+                          <span className="text-slate-400">
+                            {format(new Date(item.createdAt), "dd MMM yyyy", { locale: ptBR })}
                           </span>
-                        )}
+                        </div>
                       </div>
-                    </div>
-
-                    {/* Conteúdo */}
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <span className="text-sm font-semibold text-gray-900">
-                          {item.author.nome}
-                        </span>
-                        <span className="text-sm text-gray-500">→</span>
-                        <span className="text-sm font-semibold text-gray-900">
-                          {item.recipient.nome}
-                        </span>
-                      </div>
-
-                      <p className="text-gray-700 mb-3">{item.message}</p>
-
-                      <div className="flex items-center space-x-4">
-                        <Badge variant="warning">
-                          <Star className="w-3 h-3 mr-1 inline fill-current" />
-                          Rating: {item.rating}
-                        </Badge>
-                        <Badge variant="info">
-                          <ThumbsUp className="w-3 h-3 mr-1 inline" />
-                          Likes: {item.likes}
-                        </Badge>
-                        <Badge variant="success">
-                          <TrendingUp className="w-3 h-3 mr-1 inline" />
-                          Score: {item.score}
-                        </Badge>
-                      </div>
-
-                      <div className="mt-2 text-xs text-gray-500">
-                        {format(new Date(item.createdAt), "dd 'de' MMMM 'de' yyyy", {
-                          locale: ptBR,
-                        })}
-                      </div>
-                    </div>
+                    ))}
                   </div>
-                </Card>
-              ))
+                </div>
+              </>
             )}
           </div>
-        </div>
-      </Container>
+        </Container>
+      </div>
     </DashboardLayout>
   )
 }
